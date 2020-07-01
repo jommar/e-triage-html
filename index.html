@@ -24,7 +24,7 @@
   <body>
     <div id="vue-app" class="vh-100" v-bind:class="[covidCleared, textColor]">
       <h1 class="mb-3 bg-primary p-3 text-white">UERM E-Triage</h1>
-      <div class="container py-5">
+      <div class="container-fluid py-5">
         <div v-if="showStatus" class="text-center">
           <div v-if="!isForCovidEr">
             <h1>You may now enter the UERM premises.</h1>
@@ -57,7 +57,7 @@
 
         <div class="row" v-if="currentPage == '/' && !showStatus">
           <div class="col-sm-6" v-for="app in apps">
-            <div class="position-relative" v-bind:class="[app.background]" style="padding-top: 100%;">
+            <div class="position-relative rounded" v-bind:class="[app.background]" style="padding-top: 100%;">
               <a
                 v-on:click="setPage(app.route)"
                 href="#"
@@ -65,7 +65,7 @@
                 style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;"
                 
               >
-                <h1><b v-bind:class="app.icon"></b></h1>
+                <h1 class="display-2"><b v-bind:class="app.icon"></b></h1>
                 <h2>{{app.name}}</h2>
               </a>
             </div>
@@ -207,9 +207,12 @@
               {{formErrorMessage}}
             </div>
             <div>
-              <button v-if="!isFormLoading" class="btn btn-primary btn-sm">
-                <b class="fa fa-sign-in"></b> Login
-              </button>
+              <div v-if="!isFormLoading" class="btn-group">
+                <button class="btn btn-primary">
+                  <b class="fa fa-sign-in"></b> Login
+                </button>
+                <button type="button" v-on:click="initValues" class="btn btn-outline-dark">Back</button>
+              </div>
               <b v-if="isFormLoading" class="p-3 fa fa-spinner fa-spin"></b>
             </div>
           </div>

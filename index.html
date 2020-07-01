@@ -371,11 +371,7 @@
               return;
             }
 
-            if(form['SymptomAndHistory_Code']) {
-              this.isForCovidEr = true;
-              this.covidCleared = 'bg-danger';
-              this.textColor = 'text-color';
-            } else if(form['Temperature'] > 36.5) {
+            if(form['SymptomAndHistory_Code'] || form['Temperature'] > 37.7) {
               this.isForCovidEr = true;
               this.covidCleared = 'bg-danger';
               this.textColor = 'text-color';
@@ -391,7 +387,6 @@
             this.isAuthenticated = false;
             this.currentPage = '/';
 
-            console.log(responseJson);
           },
           changeScreen(type) {
             if (type == "+") {
@@ -428,7 +423,13 @@
               }
             );
             const responseJson = await response.json();
-            console.log(responseJson);
+            
+
+            if(responseJson.length > 0) {
+              this.showStatus = true;
+            }
+
+            return responseJson;
 
             // if (responseJson.result.length == 0) {
             //   this.isFormLoading = false;
@@ -460,7 +461,8 @@
           async loginEmployee(event) {
             const form = this.empForm;
             this.isFormLoading = true;
-            this.checkDailyVisit();
+            const checkVisit = await this.checkDailyVisit();
+            
             const response = await fetch(
               `${this.apiUrl}employees/search/code?auth=${this.apiKey}&code=${form.code}`,
               {
@@ -492,10 +494,34 @@
 
             this.name = info.NAME;
 
-            this.currentScreen++;
-            this.isAuthenticated = true;
-            this.formErrorMessage = null;
-            this.isFormLoading = false;
+            if(checkVisit['result'].length > 0) {
+              if(checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7)
+              {
+                
+                this.isForCovidEr = true;
+                this.covidCleared = 'bg-danger';
+                this.textColor = 'text-color';
+                this.showStatus = true;
+                this.currentScreen = 0;
+                this.isAuthenticated = false;
+                this.currentPage = '/';
+              } else {
+                this.isForCovidEr = false;
+                this.covidCleared = 'bg-success';
+                this.textColor = 'text-color';
+                this.showStatus = true;
+                this.currentScreen = 0;
+                this.isAuthenticated = false;
+                this.currentPage = '/';
+              }
+            } else {
+              this.currentScreen++;
+              this.isAuthenticated = true;
+              this.formErrorMessage = null;
+              this.isFormLoading = false;
+            }
+
+            
           },
 
 

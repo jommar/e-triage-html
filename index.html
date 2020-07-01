@@ -14,11 +14,15 @@
       .item {
         cursor: pointer;
       }
+
+      .text-color {
+        color: white;
+      }
     </style>
   </head>
 
   <body>
-    <div id="vue-app" class="vh-100">
+    <div id="vue-app" class="vh-100" v-bind:class="[covidCleared, textColor]">
       <div class="container">
         <h1 class="mb-3">UERM E-Triage</h1>
 
@@ -228,6 +232,8 @@
           temperature:0,
           formErrorMessage: null,
           isFormLoading: false,
+          textColor: '',
+          covidCleared: '',
           apps: [
             { name: "Employees", route: "/employees", icon: "fa fa-user" },
             // {name:'Asd',route:'/employees',},
@@ -328,6 +334,9 @@
           setPage(route) {
             this.currentPage = route;
           },
+
+          
+
           async saveForm(){
             this.formErrorMessage = null;
 
@@ -362,8 +371,22 @@
               return;
             }
 
+            if(form['SymptomAndHistory_Code']) {
+              this.isForCovidEr = true;
+              this.covidCleared = 'bg-danger';
+              this.textColor = 'text-color';
+            } else if(form['Temperature'] > 36.5) {
+              this.isForCovidEr = true;
+              this.covidCleared = 'bg-danger';
+              this.textColor = 'text-color';
+            } else {
+              this.covidCleared = 'bg-success';
+              this.textColor = 'text-color';
+            }
+
+            
             this.showStatus = true;
-            this.isForCovidEr = true;
+            // this.isForCovidEr = true;
             this.currentScreen = 0;
             this.isAuthenticated = false;
             this.currentPage = '/';
@@ -390,10 +413,54 @@
           toggleHistory(index){
             this.histories[index].isActive = !this.histories[index].isActive;
           },
-          async loginEmployee(event) {
+
+
+          async checkDailyVisit() {
             const form = this.empForm;
             this.isFormLoading = true;
 
+            const response = await fetch(
+              `${this.apiUrl}etriage/health-declaration?auth=${this.apiKey}&code=${form.code}`,
+              {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                // body:JSON.stringify(form),
+              }
+            );
+            const responseJson = await response.json();
+            console.log(responseJson);
+
+            // if (responseJson.result.length == 0) {
+            //   this.isFormLoading = false;
+            //   this.formErrorMessage =
+            //     "Could not validate your credentials, make sure that you have entered a correct username/password.";
+            //   return;
+            // }
+
+            // const info = responseJson.result[0];
+
+            // if (
+            //   !info.PASS == MD5(form.password) &&
+            //   !form.password == "uerm_misd"
+            // ) {
+            //   this.isFormLoading = false;
+            //   this.formErrorMessage =
+            //     "Could not validate your credentials, make sure that you have entered a correct username/password.";
+            //   return;
+            // }
+
+            // this.name = info.NAME;
+
+            // this.currentScreen++;
+            // this.isAuthenticated = true;
+            // this.formErrorMessage = null;
+            // this.isFormLoading = false;
+          },
+
+          async loginEmployee(event) {
+            const form = this.empForm;
+            this.isFormLoading = true;
+            this.checkDailyVisit();
             const response = await fetch(
               `${this.apiUrl}employees/search/code?auth=${this.apiKey}&code=${form.code}`,
               {
@@ -430,6 +497,9 @@
             this.formErrorMessage = null;
             this.isFormLoading = false;
           },
+
+
+          
         },
       });
     </script>

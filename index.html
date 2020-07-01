@@ -53,12 +53,13 @@
 
         <div class="row" v-if="currentPage == '/' && !showStatus">
           <div class="col-sm-6" v-for="app in apps">
-            <div class="position-relative" style="padding-top: 100%;">
+            <div class="position-relative" v-bind:class="[app.background]" style="padding-top: 100%;">
               <a
                 v-on:click="setPage(app.route)"
                 href="#"
                 class="position-absolute d-flex align-items-center justify-content-center flex-column"
-                style="top: 0; bottom: 0; left: 0; right: 0;"
+                style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;"
+                
               >
                 <h1><b v-bind:class="app.icon"></b></h1>
                 <h2>{{app.name}}</h2>
@@ -235,7 +236,7 @@
           textColor: '',
           covidCleared: '',
           apps: [
-            { name: "Employees", route: "/employees", icon: "fa fa-user" },
+            { name: "Employees", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
             // {name:'Asd',route:'/employees',},
           ],
           symptoms: [

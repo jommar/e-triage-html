@@ -31,6 +31,7 @@
             <h1>You may now enter the UERM premises.</h1>
             <b class="fa fa-check-circle" style="font-size:13rem"></b>
             <h3>{{name}}</h3>
+            <h4>{{date}}</h4>
             <p>KINDLY OBSERVE THE FOLLOWING:
               <ul style="list-style-type:none;">
                 <li>Wear a mask at all times</li>
@@ -43,6 +44,7 @@
             <h1>Please proceed to COVID ER for proper evaluation and management.</h1>
             <b class="fa fa-exclamation-circle" style="font-size:13rem"></b>
             <h3>{{name}}</h3>
+            <h4>{{date}}</h4>
             <p>KINDLY OBSERVE THE FOLLOWING:
               <ul style="list-style-type:none;">
                 <li>Wear a mask at all times</li>
@@ -75,7 +77,7 @@
           </div>
         </div>
 
-        <div v-if="isAuthenticated">
+        <div v-if="isAuthenticated" class="form-container">
           <div v-if="currentScreen == 1">
             <h3 class="text-center">COVID-19 HEALTH DECLARATION FORM</h3>
             <p class="lead">
@@ -236,6 +238,7 @@
             code: "",
             password: "",
           },
+          date:new Date().toDateString(),
           isForCovidEr:false,
           showStatus:false,
           name:null,
@@ -397,6 +400,7 @@
 
           },
           changeScreen(type) {
+            document.querySelector('.form-container').scrollIntoView();
             if (type == "+") {
               if(this.currentScreen >= 4){
                 this.saveForm();
@@ -488,6 +492,7 @@
             }
 
             this.name = info.NAME;
+            this.dae = new Date().toDateString();
 
             if(checkVisit['result'].length > 0) {
               if(checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7)

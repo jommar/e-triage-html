@@ -9,6 +9,9 @@
     <script src="vue/vue.js"></script>
     <script src="javascripts/md5.js"></script>
     <style>
+      body,html{
+        height: 100% !important;
+      }
       .item.active {
         background-color: rgba(166, 220, 255, 0.5);
       }
@@ -19,11 +22,14 @@
       .text-color {
         color: white;
       }
+      #vue-app{
+        overflow:auto;
+      }
     </style>
   </head>
 
   <body>
-    <div id="vue-app" class="vh-100" v-bind:class="[covidCleared, textColor]">
+    <div id="vue-app" class="h-100" v-bind:class="[covidCleared, textColor]">
       <h1 class="mb-3 bg-primary p-3 text-white">UERM E-Triage</h1>
       <div class="container-fluid py-5">
         <div v-if="showStatus" class="text-center">

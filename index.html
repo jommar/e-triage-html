@@ -29,6 +29,7 @@
           <div v-if="!isForCovidEr">
             <h1>You may now enter the UERM premises.</h1>
             <b class="fa fa-check-circle" style="font-size:13rem"></b>
+            <h3>{{name}}</h3>
             <p>KINDLY OBSERVE THE FOLLOWING:
               <ul style="list-style-type:none;">
                 <li>Wear a mask at all times</li>
@@ -40,6 +41,7 @@
           <div v-if="isForCovidEr">
             <h1>Please proceed to COVID ER for proper evaluation and management.</h1>
             <b class="fa fa-exclamation-circle" style="font-size:13rem"></b>
+            <h3>{{name}}</h3>
             <p>KINDLY OBSERVE THE FOLLOWING:
               <ul style="list-style-type:none;">
                 <li>Wear a mask at all times</li>

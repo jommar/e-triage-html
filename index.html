@@ -64,12 +64,20 @@
             <button class="btn btn-outline-light" v-on:click="initValues"><b class="fa fa-arrow-left"></b> Go Back</button>
           </div>
 
-    <header>
+        </div>
 
-      <div class="navbar navbar-dark bg-primary shadow-sm">
-          <div class="container d-flex justify-content-between">
-              <a href="/" class="navbar-brand d-flex align-items-center">
-                <h3 class="mb-3">UERM ETriage</h3>
+        <div class="row" v-if="currentPage == '/' && !showStatus">
+          <div class="col-sm-6" v-for="app in apps">
+            <div class="position-relative rounded" v-bind:class="[app.background]" style="padding-top: 100%;">
+              <a
+                v-on:click="setPage(app.route)"
+                href="#"
+                class="position-absolute d-flex align-items-center justify-content-center flex-column"
+                style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;"
+                
+              >
+                <h1 class="display-2"><b v-bind:class="app.icon"></b></h1>
+                <h2>{{app.name}}</h2>
               </a>
             </div>
           </div>
@@ -89,255 +97,139 @@
               to completing the information. Thank you.
             </p>
           </div>
-      </div>
-    </header>
 
-   
-      
-
-          <div id="vue-app" class="vh-100" v-bind:class="[covidCleared, textColor]">
-                <br>
-                <br>
-
-                <div class="container">
-
-                  <div v-if="showStatus" class="text-center">
-                    <div v-if="!isForCovidEr">
-                      <h1>You may now enter the UERM premises.</h1>
-                      <b class="fa fa-check-circle" style="font-size:13rem"></b>
-                      <p>KINDLY OBSERVE THE FOLLOWING:
-                        <ul>
-                          <li>Wear a mask at all times</li>
-                          <li>Observe physical distancing</li>
-                          <li>Wash or sanitize your hands regularly</li>
-                        </ul>
-                      </p>
-                    </div>
-                    <div v-if="isForCovidEr">
-                      <h1>Please proceed to COVID ER for proper evaluation and management.</h1>
-                      <b class="fa fa-exclamation-circle" style="font-size:13rem"></b>
-                      <p>KINDLY OBSERVE THE FOLLOWING:
-                        <ul>
-                          <li>Wear a mask at all times</li>
-                          <li>Observe physical distancing</li>
-                          <li>Wash or sanitize your hands regularly</li>
-                        </ul>
-                      </p>
-                    </div>
-                  </div>
-
-                  <div class="row" v-if="currentPage == '/' && !showStatus">
-                    <div class="col-sm-6" v-for="app in apps">
-                      <div class="position-relative" v-bind:class="[app.background]" style="padding-top: 100%;">
-                        <a
-                          v-on:click="setPage(app.route)"
-                          href="#"
-                          class="position-absolute d-flex align-items-center justify-content-center flex-column"
-                          style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;"
-                          
-                        >
-                          <h1><b v-bind:class="app.icon"></b></h1>
-                          <h2>{{app.name}}</h2>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="isAuthenticated">
-                    <div v-if="currentScreen == 1">
-                      <h3 class="text-center">COVID-19 HEALTH DECLARATION FORM</h3>
-                      <p class="lead">
-                        In line with the Republic Act 11332 "Mandatory Reporting of
-                        Notifiable Diseases and Health Events of Public Health Concern Act",
-                        and to assure the safety and protection of the general public,
-                        please fill out this HEALTH DECLARATION FORM truthfully. This
-                        required information will be used in accordance with the law. Any
-                        incorrect information provided will be dealth with accordingly.
-                        Submit yourself for temperature checking and recording, and procedd
-                        to completing the information. Thank you.
-                      </p>
-                    </div>
-
-                    <div v-if="currentScreen == 2">
-                      <div class="lead alert alert-info">
-                        Please click on the symptoms that you are currently experiencing.
-                        Click Continue to proceed.
-                      </div>
-                      <div
-                        v-for="(symptom, index) in symptoms"
-                        class="p-3 border-bottom border-dark item"
-                        v-on:click="toggleSymptom(index)"
-                        v-bind:class="{active:symptom.isActive}"
-                      >
-                        <h4>{{symptom.english}}</h4>
-                        <div>{{symptom.tagalog}}</div>
-                      </div>
-                    </div>
-
-                    <div v-if="currentScreen == 3">
-                      <div class="lead alert alert-info">
-                        Please click on the following items regarding your history of
-                        exposure. Click Continue to proceed.
-                      </div>
-                      <div
-                        v-for="(history, index) in histories"
-                        class="p-3 border-bottom border-dark item"
-                        v-on:click="toggleHistory(index)"
-                        v-bind:class="{active:history.isActive}"
-                      >
-                        <h4>{{history.english}}</h4>
-                        <div>{{history.tagalog}}</div>
-                      </div>
-                    </div>
-
-                    <div v-if="currentScreen == 4">
-                      <label class="full-width p-3 border-bottom border-dark w-100">
-                        <b>Temperature</b>
-                        <input
-                          type="number"
-                          min="35"
-                          max="42"
-                          class="form-control"
-                          v-model="temperature"
-                          placeholder="Temperature"
-                          step="any"
-                        />
-                      </label>
-
-                      <div class="d-flex align-items-center border-bottom border-dark item">
-                        <div v-on:click="isTermsAccepted = !isTermsAccepted">
-                          I, {{name}} certify that the information I have given is true,
-                          correct, and complete. I understand that failure to answer any
-                          question or giving false answer can be penalized in accordance
-                          with law. I voluntarily and freely consent to the collection,
-                          processing, sharing and storage of the above personal information
-                          with the Data Privacy Act of 2012 and it's implementing Rules and
-                          Regulations.
-                        </div>
-                        <div class="ml-3">
-                          <input type="checkbox" v-model="isTermsAccepted" />
-                        </div>
-                      </div>
-
-                      <div class="my-2 alert alert-danger" v-if="formErrorMessage != null">
-                        {{formErrorMessage}}
-                      </div>
-                    </div>
-
-                    <div class="text-center mt-3">
-                      <div class="btn-group">
-                        <button
-                          v-on:click="changeScreen('+')"
-                          class="btn btn-primary btn-sm"
-                        >
-                          <span v-if="currentScreen < 4">Continue</span>
-                          <span v-if="currentScreen >= 4"
-                            ><b class="fa fa-save"></b> Submit</span
-                          >
-                        </button>
-                        <button
-                          v-on:click="changeScreen('-')"
-                          class="btn btn-outline-primary btn-sm"
-                        >
-                          Back
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <form
-                    v-on:submit.prevent="loginEmployee"
-                    class="card"
-                    v-if="currentPage == '/employees' && !isAuthenticated"
-                  >
-                    <h3 class="card-header">Employees</h3>
-                    <div class="card-body">
-                      <label class="w-100">
-                        <b>Employee Code</b>
-                        <input
-                          type="text"
-                          required
-                          class="form-control"
-                          placeholder="Employee Code"
-                          name="code"
-                          v-model="empForm.code"
-                        />
-                      </label>
-                      <label class="w-100">
-                        <b>Password</b>
-                        <input
-                          type="password"
-                          required
-                          class="form-control"
-                          placeholder="Password"
-                          name="password"
-                          v-model="empForm.password"
-                        />
-                      </label>
-                      <div class="my-2 alert alert-danger" v-if="formErrorMessage != null">
-                        {{formErrorMessage}}
-                      </div>
-                      <div>
-                        <button v-if="!isFormLoading" class="btn btn-primary btn-sm">
-                          <b class="fa fa-sign-in"></b> Login
-                        </button>
-                        <b v-if="isFormLoading" class="p-3 fa fa-spinner fa-spin"></b>
-                      </div>
-                    </div>
-                  </form>
-
-
-                  <div class="row" v-if="currentPage == '/visitors' && !showStatus">
-                    <div class="col-sm-6" v-for="other_user in other_users">
-                      <div class="position-relative" v-bind:class="[other_user.background]" style="padding-top: 100%;">
-                        <a
-                          v-on:click="setPage(other_user.route)"
-                          href="#"
-                          class="position-absolute d-flex align-items-center justify-content-center flex-column"
-                          style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;"
-                          
-                        >
-                          <h1><b v-bind:class="other_user.icon"></b></h1>
-                          <h2>{{other_user.name}}</h2>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="currentPage == '/register' && !showStatus">
-                      
-                          <form class="card" v-on:submit.prevent="registerUser">
-                            <h3 class="card-header">Register</h3>
-                            <div class="card-body">
-                              <div v-for="user_detail in user_details">
-                                
-                                <label class="w-100">
-                                  <b>{{user_detail.placeholder}}</b>
-                                  <input type="text" class="form-control" v-model="user_detail.model" :name="[user_detail.name]" :placeholder="[user_detail.placeholder]">
-                                </label>
-                                
-                              </div>
-
-                              <div>
-                                <button v-if="!isFormLoading" class="btn btn-primary btn-sm">
-                                  <b class="fa fa-save"></b> Save
-                                </button>
-                                <b v-if="isFormLoading" class="p-3 fa fa-spinner fa-spin"></b>
-                              </div>
-
-                            </div>
-                          </form>
-                      
-                      
-                  </div>
-
-                </div>
-              
+          <div v-if="currentScreen == 2">
+            <div class="lead alert alert-info">
+              Please click on the symptoms that you are currently experiencing.
+              Click Continue to proceed.
+            </div>
+            <div
+              v-for="(symptom, index) in symptoms"
+              class="p-3 border-bottom border-dark item"
+              v-on:click="toggleSymptom(index)"
+              v-bind:class="{active:symptom.isActive}"
+            >
+              <h4>{{symptom.english}}</h4>
+              <div>{{symptom.tagalog}}</div>
+            </div>
           </div>
-        
-      
-   
 
+          <div v-if="currentScreen == 3">
+            <div class="lead alert alert-info">
+              Please click on the following items regarding your history of
+              exposure. Click Continue to proceed.
+            </div>
+            <div
+              v-for="(history, index) in histories"
+              class="p-3 border-bottom border-dark item"
+              v-on:click="toggleHistory(index)"
+              v-bind:class="{active:history.isActive}"
+            >
+              <h4>{{history.english}}</h4>
+              <div>{{history.tagalog}}</div>
+            </div>
+          </div>
+
+          <div v-if="currentScreen == 4">
+            <label class="full-width p-3 border-bottom border-dark w-100">
+              <b>Temperature</b>
+              <input
+                type="number"
+                min="35"
+                max="42"
+                class="form-control"
+                v-model="temperature"
+                placeholder="Temperature"
+                step="any"
+              />
+            </label>
+
+            <div class="d-flex align-items-center border-bottom border-dark item">
+              <div v-on:click="isTermsAccepted = !isTermsAccepted">
+                I, {{name}} certify that the information I have given is true,
+                correct, and complete. I understand that failure to answer any
+                question or giving false answer can be penalized in accordance
+                with law. I voluntarily and freely consent to the collection,
+                processing, sharing and storage of the above personal information
+                with the Data Privacy Act of 2012 and it's implementing Rules and
+                Regulations.
+              </div>
+              <div class="ml-3">
+                <input type="checkbox" v-model="isTermsAccepted" />
+              </div>
+            </div>
+
+            <div class="my-2 alert alert-danger" v-if="formErrorMessage != null">
+              {{formErrorMessage}}
+            </div>
+          </div>
+
+          <div class="text-center mt-3">
+            <div class="btn-group">
+              <button
+                v-on:click="changeScreen('+')"
+                class="btn btn-primary btn-sm"
+              >
+                <span v-if="currentScreen < 4">Continue</span>
+                <span v-if="currentScreen >= 4"
+                  ><b class="fa fa-save"></b> Submit</span
+                >
+              </button>
+              <button
+                v-on:click="changeScreen('-')"
+                class="btn btn-outline-primary btn-sm"
+              >
+                Back
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <form
+          v-on:submit.prevent="loginEmployee"
+          class="card"
+          v-if="currentPage == '/employees' && !isAuthenticated"
+        >
+          <h3 class="card-header">Employees</h3>
+          <div class="card-body">
+            <label class="w-100">
+              <b>Employee Code</b>
+              <input
+                type="text"
+                required
+                class="form-control"
+                placeholder="Employee Code"
+                name="code"
+                v-model="empForm.code"
+              />
+            </label>
+            <label class="w-100">
+              <b>Password</b>
+              <input
+                type="password"
+                required
+                class="form-control"
+                placeholder="Password"
+                name="password"
+                v-model="empForm.password"
+              />
+            </label>
+            <div class="my-2 alert alert-danger" v-if="formErrorMessage != null">
+              {{formErrorMessage}}
+            </div>
+            <div>
+              <div v-if="!isFormLoading" class="btn-group">
+                <button class="btn btn-primary">
+                  <b class="fa fa-sign-in"></b> Login
+                </button>
+                <button type="button" v-on:click="initValues" class="btn btn-outline-dark">Back</button>
+              </div>
+              <b v-if="isFormLoading" class="p-3 fa fa-spinner fa-spin"></b>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script>
       const vue = new Vue({
@@ -364,46 +256,7 @@
           covidCleared: '',
           apps: [
             { name: "Employees", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
-            { name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
-          ],
-          other_users: [
-            { name: "Register", route: "/register", icon: "fa fa-user-plus", background: "bg-primary"},
-            { name:'Existing',route:'/search', icon: "fa fa-search", background: "bg-danger"},
-          ],
-          
-          user_details: [
-            {
-              name: "firstName",
-              placeholder: "First Name",
-              model: "",
-            },
-            {
-              name: "lastName",
-              placeholder: "Last Name",
-              model: "",
-            },
-
-            {
-              name: "middleInitial",
-              placeholder: "Middle Initial",
-              model: "",
-            },
-            {
-              name: "address",
-              placeholder: "Address",
-              model: "",
-            },
-            {
-              name: "contactNo",
-              placeholder: "Contact #",
-              model: "",
-            },
-
-            {
-              name: "remarks",
-              placeholder: "Purpose",
-              model: "",
-            },
+            // {name:'Asd',route:'/employees',},
           ],
           symptoms: [
             {
@@ -501,10 +354,9 @@
           setPage(route) {
             this.currentPage = route;
           },
-
           async saveForm(){
             this.formErrorMessage = null;
-            
+
             const symptoms = this.symptoms.map((symptom)=>{return symptom.isActive ? symptom.code : null}).filter((item)=>{return item != null});
             const histories = this.histories.map((history)=>{return history.isActive ? history.code : null}).filter((item)=>{return item != null});
             const form = {
@@ -606,19 +458,13 @@
             );
             const responseJson = await response.json();
             
-
             if(responseJson.length > 0) {
               this.showStatus = true;
             }
-
             return responseJson;
-
           },
-
-          
           async loginEmployee(event) {
             const form = this.empForm;
-            
             this.isFormLoading = true;
             const checkVisit = await this.checkDailyVisit();
             
@@ -686,55 +532,7 @@
               this.formErrorMessage = null;
               this.isFormLoading = false;
             }
-
-            
-          },
-
-
-          async registerUser(event) {
-            const form = this.user_details;
-         
-            this.isFormLoading = true;
-            
-
-            const save_form = {
-              FirstName: form[0]['model'],
-              LastName: form[1]['model'],
-              MiddleInitial: form[2]['model'],
-              Department: form[3]['model'],
-              ContactNo: form[4]['model'],
-              Remarks: form[5]['model'],
-              UserType: 'visitor',
-            };
-
-            
-
-            const response = await fetch(
-              `${this.apiUrl}etriage/register-user?auth=${this.apiKey}`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body:JSON.stringify(save_form),
-              }
-            );
-      
-            console.log(save_form);
-
-            const responseJson = await response.json();
-            console.log(responseJson);
-            if(responseJson.error){
-              this.formErrorMessage = responseJson.message;
-              return;
-            } else {
-              this.isFormLoading = false;
-            }
-
-            
-          
-          }
-
-
-          
+          },          
         },
       });
     </script>

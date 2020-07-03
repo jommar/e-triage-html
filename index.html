@@ -574,8 +574,24 @@
           toggleHistory(index){
             this.histories[index].isActive = !this.histories[index].isActive;
           },
-
-
+          initValues(){
+            this.isAuthenticated = false;
+            this.currentPage = "/";
+            this.currentScreen = 0;
+            this.empForm = {
+              code: "",
+              password: "",
+            };
+            this.isForCovidEr = false;
+            this.showStatus = false;
+            this.name = null;
+            this.isTermsAccepted = false;
+            this.temperature = 0;
+            this.formErrorMessage =  null;
+            this.isFormLoading =  false;
+            this.textColor =  '';
+            this.covidCleared =  '';
+          },
           async checkDailyVisit() {
             const form = this.empForm;
             this.isFormLoading = true;

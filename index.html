@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css" />
     <script src="bootstrap/js/bootstrap.js"></script>
-    <script src="vue/vue.min.js"></script>
+    <script src="vue/vue.js"></script>
     <script src="javascripts/md5.js"></script>
     <style>
       body,html{
@@ -155,7 +155,7 @@
                 Regulations.
               </div>
               <div class="ml-3">
-                <input type="checkbox" v-model="isTermsAccepted" />
+                <input type="checkbox" style="width: 30px; height: 30px;" v-model="isTermsAccepted" />
               </div>
             </div>
 
@@ -306,12 +306,12 @@
           covidCleared: '',
           apps: [
             { name: "Employees", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
-            { name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
+            //{ name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
           ],
 
           other_users: [
             { name: "Register", route: "/register", icon: "fa fa-user-plus", background: "bg-info"},
-            { name:'Existing',route:'/search', icon: "fa fa-search", background: "bg-warning"},
+            
           ],
           user_details: [
             {
@@ -320,14 +320,13 @@
               model: "",
             },
             {
-              name: "lastName",
-              placeholder: "Last Name",
-              model: "",
-            },
-
-            {
               name: "middleInitial",
               placeholder: "Middle Initial",
+              model: "",
+            },
+            {
+              name: "lastName",
+              placeholder: "Last Name",
               model: "",
             },
             {
@@ -448,14 +447,28 @@
 
             const symptoms = this.symptoms.map((symptom)=>{return symptom.isActive ? symptom.code : null}).filter((item)=>{return item != null});
             const histories = this.histories.map((history)=>{return history.isActive ? history.code : null}).filter((item)=>{return item != null});
+            
+            
             const form = {
               Temperature:this.temperature,
               Code:this.empForm.code,
+              LastName:this.lastName,
+              FirstName:this.firstName,
+              MiddleInitial:this.middleInitial,
+              Address:this.address,
+              ContactNo:this.contactNo,
+              Purpose:this.purpose,
+              UserType:this.userType,
+              
               SymptomAndHistory_Code:[
                 ...symptoms,
                 ...histories
               ].join(';'),
             };
+
+            console.log(form);
+
+            
 
             if(!this.isTermsAccepted || this.temperature < 35 || this.temperature > 42){
               this.formErrorMessage = 'Please provide your temperature and verify that you understand the terms and conditions.';
@@ -532,6 +545,14 @@
             this.isFormLoading =  false;
             this.textColor =  '';
             this.covidCleared =  '';
+
+            this.user_details[0]['model'] = '';
+            this.user_details[1]['model']  = '';
+            this.user_details[2]['model']  = ''; 
+            this.user_details[3]['model']  = '';
+            this.user_details[4]['model']  = '';
+            this.user_details[5]['model']  = '';
+
           },
           async checkDailyVisit() {
             const form = this.empForm;
@@ -626,39 +647,76 @@
             const form = this.user_details;
             this.isFormLoading = true;
 
+            const checkIfExist = await this.checkIfUserExist();
+            console.log(checkIfExist);
+
+            
+            const user_code = {
+              UserCode:
+              [
+                form[0]['model'].toLowerCase(),
+                form[2]['model'].toLowerCase(),
+                form[1]['model'].toLowerCase(),
+              ].join('_'),
+            };
+
+            
             const save_form = {
+              UserCode: user_code['UserCode'],
               FirstName: form[0]['model'],
-              LastName: form[1]['model'],
-              MiddleInitial: form[2]['model'],
-              Department: form[3]['model'],
+              MiddleInitial: form[1]['model'],
+              LastName: form[2]['model'],
+              Address: form[3]['model'],
               ContactNo: form[4]['model'],
-              Remarks: form[5]['model'],
+              Purpose: form[5]['model'],
+            };
+            
+
+            console.log(checkIfExist);
+            
+            this.name = save_form['LastName'].toUpperCase() + ', ' + save_form['FirstName'].toUpperCase() + ' ' + save_form['MiddleInitial'].toUpperCase();
+            this.empForm.code = user_code['UserCode'];
+            this.lastName = save_form['LastName'];
+            this.firstName = save_form['FirstName'];
+            this.middleInitial = save_form['MiddleInitial'];
+            this.address = save_form['Address'];
+            this.contactNo = save_form['ContactNo'];
+            this.purpose = save_form['Purpose'];
+            this.userType = 'visitor';
+
+            this.currentScreen++;
+            this.isAuthenticated = true;
+            this.formErrorMessage = null;
+            this.isFormLoading = false;
+          },
+          async checkIfUserExist() {
+            const form = this.empForm;
+            this.isFormLoading = true;
+
+            const user_form = {
+              FirstName: this.firstName,
+              LastName: this.lastName,
             };
 
             const response = await fetch(
-              `${this.apiUrl}etriage/register-user?auth=${this.apiKey}`,
+              `${this.apiUrl}etriage/existing-user?auth=${this.apiKey}`,
               {
-                method: "POST",
+                method: "GET",
                 headers: { "Content-Type": "application/json" },
-                body:JSON.stringify(save_form),
+                body:{
+                    "FirstName": "BERNARD",
+                    "LastName": "GRESOLA"
+                }
               }
             );
-
+            console.log(response);
             const responseJson = await response.json();
             
-            if(responseJson.error){
-              
-              this.formErrorMessage = responseJson.message;
-              return;
-            } else {
-              this.name = save_form['FirstName'] + ' ' + save_form['LastName'];
-              this.empForm.code = responseJson['code'];
-              this.currentScreen++;
-              this.isAuthenticated = true;
-              this.formErrorMessage = null;
-              this.isFormLoading = false;
+            if(responseJson.length > 0) {
+              this.showStatus = true;
             }
-          } 
+            return responseJson;
+          }, 
           
         },
       });

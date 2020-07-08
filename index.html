@@ -113,11 +113,7 @@
             <span>Continue</span>
           </button>
         </div>
-<<<<<<< Updated upstream
         
-=======
->>>>>>> Stashed changes
-
         <div v-if="isAuthenticated" class="form-container">
           
           <div v-if="currentScreen == 1">
@@ -509,19 +505,6 @@
               this.formErrorMessage = 'Please provide your temperature and verify that you understand the terms and conditions.';
               return;
             }
-<<<<<<< Updated upstream
-
-            console.log(form);
-
-            // const response = await fetch(
-            //   `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,
-            //   {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body:JSON.stringify(form),
-            //   }
-            // );
-=======
             
             const response = await fetch(
               `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,
@@ -531,7 +514,6 @@
                 body:JSON.stringify(form),
               }
             );
->>>>>>> Stashed changes
 
             const responseJson = await response.json();
             if(responseJson.error){

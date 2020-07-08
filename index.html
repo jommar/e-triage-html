@@ -113,9 +113,8 @@
             <span>Continue</span>
           </button>
         </div>
-        
+
         <div v-if="isAuthenticated" class="form-container">
-          
           <div v-if="currentScreen == 1">
             <h3 class="text-center">COVID-19 HEALTH DECLARATION FORM</h3>
             <p class="lead">
@@ -137,12 +136,18 @@
             </div>
             <div
               v-for="(symptom, index) in symptoms"
-              class="p-3 border-bottom border-dark item"
+              class="p-3 border-bottom border-dark item d-flex align-items-center"
               v-on:click="toggleSymptom(index)"
               v-bind:class="{active:symptom.isActive}"
             >
-              <h4>{{symptom.english}}</h4>
-              <div>{{symptom.tagalog}}</div>
+              <div class="flex-grow-1">
+                <h4>{{symptom.english}}</h4>
+                <div>{{symptom.tagalog}}</div>
+              </div>
+              <div style="width:100px" class="text-center">
+                <a href="#" class="badge" v-bind:class="{'badge-primary':symptom.isActive}">Yes</a>
+                <a href="#" class="badge" v-bind:class="{'badge-primary':!symptom.isActive}">No</a>
+              </div>
             </div>
           </div>
 
@@ -153,12 +158,18 @@
             </div>
             <div
               v-for="(history, index) in histories"
-              class="p-3 border-bottom border-dark item"
+              class="p-3 border-bottom border-dark item d-flex align-items-center"
               v-on:click="toggleHistory(index)"
               v-bind:class="{active:history.isActive}"
             >
-              <h4>{{history.english}}</h4>
-              <div>{{history.tagalog}}</div>
+              <div class="flex-grow-1">
+                <h4>{{history.english}}</h4>
+                <div>{{history.tagalog}}</div>
+              </div>
+              <div style="width:100px" class="text-center">
+                <a href="#" class="badge" v-bind:class="{'badge-primary':history.isActive}">Yes</a>
+                <a href="#" class="badge" v-bind:class="{'badge-primary':!history.isActive}">No</a>
+              </div>
             </div>
           </div>
 
@@ -334,8 +345,6 @@
           temperature:0,
           formErrorMessage: null,
           isFormLoading: false,
-          isUserExist: false,
-          isSuccessfullRegistration: false,
           textColor: '',
           covidCleared: '',
           isUserExist: false,
@@ -532,7 +541,6 @@
 
             
             this.showStatus = true;
-            // this.isForCovidEr = true;
             this.currentScreen = 0;
             this.isAuthenticated = false;
             this.currentPage = '/';
@@ -553,7 +561,6 @@
               }
             }
           },
-          
           toggleSymptom(index){
             this.symptoms[index].isActive = !this.symptoms[index].isActive;
           },
@@ -587,9 +594,9 @@
 
           },
           async checkDailyVisit() {
-            const form = await this.empForm;
+            const form = this.empForm;
             this.isFormLoading = true;
-            
+
             const response = await fetch(
               `${this.apiUrl}etriage/health-declaration?auth=${this.apiKey}&code=${form.code}`,
               {
@@ -597,7 +604,6 @@
                 headers: { "Content-Type": "application/json" },
               }
             );
-            
             const responseJson = await response.json();
             
             if(responseJson.length > 0) {
@@ -791,6 +797,7 @@
             }
             return responseJson;
           }, 
+          
         },
       });
     </script>

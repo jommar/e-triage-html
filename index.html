@@ -113,7 +113,10 @@
             <span>Continue</span>
           </button>
         </div>
+<<<<<<< Updated upstream
         
+=======
+>>>>>>> Stashed changes
 
         <div v-if="isAuthenticated" class="form-container">
           
@@ -339,6 +342,8 @@
           isSuccessfullRegistration: false,
           textColor: '',
           covidCleared: '',
+          isUserExist: false,
+          isSuccessfullRegistration: false,
           apps: [
             { name: "Employees", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
             { name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
@@ -483,7 +488,6 @@
             const symptoms = this.symptoms.map((symptom)=>{return symptom.isActive ? symptom.code : null}).filter((item)=>{return item != null});
             const histories = this.histories.map((history)=>{return history.isActive ? history.code : null}).filter((item)=>{return item != null});
             
-            
             const form = {
               Temperature:this.temperature,
               Code:this.empForm.code,
@@ -505,6 +509,7 @@
               this.formErrorMessage = 'Please provide your temperature and verify that you understand the terms and conditions.';
               return;
             }
+<<<<<<< Updated upstream
 
             console.log(form);
 
@@ -516,6 +521,17 @@
             //     body:JSON.stringify(form),
             //   }
             // );
+=======
+            
+            const response = await fetch(
+              `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body:JSON.stringify(form),
+              }
+            );
+>>>>>>> Stashed changes
 
             const responseJson = await response.json();
             if(responseJson.error){
@@ -579,7 +595,7 @@
             this.isFormLoading =  false;
             this.textColor =  '';
             this.covidCleared =  '';
-
+            
             this.user_details[0]['model'] = '';
             this.user_details[1]['model']  = '';
             this.user_details[2]['model']  = ''; 
@@ -597,7 +613,6 @@
               {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
-                // body:JSON.stringify(form),
               }
             );
             

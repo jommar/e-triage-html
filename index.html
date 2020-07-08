@@ -83,40 +83,7 @@
           </div>
         </div>
 
-        <div v-if="isUserExist && currentScreen == 0" class="text-center">
-          <h1>You are already registered to ETriage</h1>
-          <h3>{{name}}</h3> 
-          <h3>Please remember you code</h3> 
-          <br>
-          <h3><em>{{empForm.code}}</em></h3>
-
-          <button
-            v-on:click="continueScreen"
-            class="btn btn-primary btn-sm"
-          >
-            <span>Continue</span>
-          </button>
-        </div>
-
-        <div class="text-center" v-if="isSuccessfullRegistration && currentScreen == 0">
-          <h1>You successfully registered to ETriage</h1>
-          
-          <h3>{{name}}</h3> 
-
-          <h3>Please remember your code</h3> 
-          <br> 
-          <h3><em>{{empForm.code}}</em></h3>
-          <button
-            v-on:click="continueScreen"
-            class="btn btn-primary btn-sm"
-          >
-            <span>Continue</span>
-          </button>
-        </div>
-        
-
         <div v-if="isAuthenticated" class="form-container">
-          
           <div v-if="currentScreen == 1">
             <h3 class="text-center">COVID-19 HEALTH DECLARATION FORM</h3>
             <p class="lead">
@@ -138,12 +105,18 @@
             </div>
             <div
               v-for="(symptom, index) in symptoms"
-              class="p-3 border-bottom border-dark item"
+              class="p-3 border-bottom border-dark item d-flex align-items-center"
               v-on:click="toggleSymptom(index)"
               v-bind:class="{active:symptom.isActive}"
             >
-              <h4>{{symptom.english}}</h4>
-              <div>{{symptom.tagalog}}</div>
+              <div class="flex-grow-1">
+                <h4>{{symptom.english}}</h4>
+                <div>{{symptom.tagalog}}</div>
+              </div>
+              <div style="width:100px" class="text-center">
+                <a href="#" class="badge" v-bind:class="{'badge-primary':symptom.isActive}">Yes</a>
+                <a href="#" class="badge" v-bind:class="{'badge-primary':!symptom.isActive}">No</a>
+              </div>
             </div>
           </div>
 
@@ -154,12 +127,18 @@
             </div>
             <div
               v-for="(history, index) in histories"
-              class="p-3 border-bottom border-dark item"
+              class="p-3 border-bottom border-dark item d-flex align-items-center"
               v-on:click="toggleHistory(index)"
               v-bind:class="{active:history.isActive}"
             >
-              <h4>{{history.english}}</h4>
-              <div>{{history.tagalog}}</div>
+              <div class="flex-grow-1">
+                <h4>{{history.english}}</h4>
+                <div>{{history.tagalog}}</div>
+              </div>
+              <div style="width:100px" class="text-center">
+                <a href="#" class="badge" v-bind:class="{'badge-primary':history.isActive}">Yes</a>
+                <a href="#" class="badge" v-bind:class="{'badge-primary':!history.isActive}">No</a>
+              </div>
             </div>
           </div>
 
@@ -199,7 +178,7 @@
 
           <div class="text-center mt-3">
             <div class="btn-group">
-              <button v-if="currentScreen > 0"
+              <button
                 v-on:click="changeScreen('+')"
                 class="btn btn-primary btn-sm"
               >
@@ -208,7 +187,7 @@
                   ><b class="fa fa-save"></b> Submit</span
                 >
               </button>
-              <button v-if="currentScreen > 0"
+              <button
                 v-on:click="changeScreen('-')"
                 class="btn btn-outline-primary btn-sm"
               >
@@ -243,7 +222,7 @@
           
         </div>
 
-        <div v-if="currentPage == '/register' && !isAuthenticated && !isUserExist && !isSuccessfullRegistration">
+        <div v-if="currentPage == '/register' && !isAuthenticated">
           <form class="card" v-on:submit.prevent="registerUser">
             <h3 class="card-header">Register</h3>
             <div class="card-body">
@@ -335,13 +314,11 @@
           temperature:0,
           formErrorMessage: null,
           isFormLoading: false,
-          isUserExist: false,
-          isSuccessfullRegistration: false,
           textColor: '',
           covidCleared: '',
           apps: [
             { name: "Employees", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
-            { name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
+            //{ name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
           ],
 
           other_users: [
@@ -501,21 +478,23 @@
               ].join(';'),
             };
 
+            console.log(form);
+
+            
+
             if(!this.isTermsAccepted || this.temperature < 35 || this.temperature > 42){
               this.formErrorMessage = 'Please provide your temperature and verify that you understand the terms and conditions.';
               return;
             }
 
-            console.log(form);
-
-            // const response = await fetch(
-            //   `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,
-            //   {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body:JSON.stringify(form),
-            //   }
-            // );
+            const response = await fetch(
+              `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body:JSON.stringify(form),
+              }
+            );
 
             const responseJson = await response.json();
             if(responseJson.error){
@@ -555,7 +534,6 @@
               }
             }
           },
-          
           toggleSymptom(index){
             this.symptoms[index].isActive = !this.symptoms[index].isActive;
           },
@@ -589,9 +567,9 @@
 
           },
           async checkDailyVisit() {
-            const form = await this.empForm;
+            const form = this.empForm;
             this.isFormLoading = true;
-            
+
             const response = await fetch(
               `${this.apiUrl}etriage/health-declaration?auth=${this.apiKey}&code=${form.code}`,
               {
@@ -600,7 +578,6 @@
                 // body:JSON.stringify(form),
               }
             );
-            
             const responseJson = await response.json();
             
             if(responseJson.length > 0) {
@@ -683,6 +660,8 @@
             this.isFormLoading = true;
 
             const checkIfExist = await this.checkIfUserExist();
+            console.log(checkIfExist);
+
             
             const user_code = {
               UserCode:
@@ -693,6 +672,7 @@
               ].join('_'),
             };
 
+            
             const save_form = {
               UserCode: user_code['UserCode'],
               FirstName: form[0]['model'],
@@ -703,90 +683,45 @@
               Purpose: form[5]['model'],
             };
             
+
+            console.log(checkIfExist);
+            
             this.name = save_form['LastName'].toUpperCase() + ', ' + save_form['FirstName'].toUpperCase() + ' ' + save_form['MiddleInitial'].toUpperCase();
-            
-            if(checkIfExist['result'].length == 0) {
-              this.empForm.code = user_code['UserCode'];
-              this.lastName = save_form['LastName'];
-              this.firstName = save_form['FirstName'];
-              this.middleInitial = save_form['MiddleInitial'];
-              this.address = save_form['Address'];
-              this.contactNo = save_form['ContactNo'];
-              this.purpose = save_form['Purpose'];
-              this.userType = 'visitor';
-              
-            } else {
-              this.empForm.code = checkIfExist['result'][0]['UserCode'];
-              this.lastName = checkIfExist['result'][0]['LastName'];
-              this.firstName = checkIfExist['result'][0]['FirstName'];
-              this.middleInitial = checkIfExist['result'][0]['MiddleInitial'];
-              this.address = checkIfExist['result'][0]['Address'];
-              this.contactNo = checkIfExist['result'][0]['ContactNo'];
-              this.purpose = checkIfExist['result'][0]['Purpose'];
-              this.userType = checkIfExist['result'][0]['UserType'];
-            }
+            this.empForm.code = user_code['UserCode'];
+            this.lastName = save_form['LastName'];
+            this.firstName = save_form['FirstName'];
+            this.middleInitial = save_form['MiddleInitial'];
+            this.address = save_form['Address'];
+            this.contactNo = save_form['ContactNo'];
+            this.purpose = save_form['Purpose'];
+            this.userType = 'visitor';
 
-              if(checkIfExist['result'].length == 0) {
-                this.isSuccessfullRegistration = true;
-                this.isAuthenticated = true;
-                this.formErrorMessage = null;
-                this.isFormLoading = false;
-              } else {
-                this.isUserExist = true;
-                this.isAuthenticated = true;
-                this.formErrorMessage = null;
-                this.isFormLoading = false;
-              }
-          },
-          async continueScreen() {
-            
-            const checkVisit = await this.checkDailyVisit();
-            
-            if(checkVisit['result'].length > 0) {
-              if(checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7)
-              {
-                
-                this.isForCovidEr = true;
-                this.isUserExist = false;
-                this.covidCleared = 'bg-danger';
-                this.textColor = 'text-color';
-                this.showStatus = true;
-                this.currentScreen = 0;
-                this.isAuthenticated = false;
-                this.currentPage = '/';
-              } else {
-                this.isForCovidEr = false;
-                this.isUserExist = false;
-                this.covidCleared = 'bg-success';
-                this.textColor = 'text-color';
-                this.showStatus = true;
-                this.currentScreen = 0;
-                this.isAuthenticated = false;
-                this.currentPage = '/';
-              }
-            } else {
-              this.currentScreen = 1;
-              this.isAuthenticated = true;
-            }
-
+            this.currentScreen++;
+            this.isAuthenticated = true;
+            this.formErrorMessage = null;
+            this.isFormLoading = false;
           },
           async checkIfUserExist() {
             const form = this.empForm;
             this.isFormLoading = true;
 
             const user_form = {
-              FirstName: this.user_details[0]['model'].toUpperCase(),
-              LastName: this.user_details[2]['model'].toUpperCase(),
+              FirstName: this.firstName,
+              LastName: this.lastName,
             };
 
             const response = await fetch(
-              `${this.apiUrl}etriage/existing-user?auth=${this.apiKey}&FirstName=${user_form.FirstName}&LastName=${user_form.LastName}`,
+              `${this.apiUrl}etriage/existing-user?auth=${this.apiKey}`,
               {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
+                body:{
+                    "FirstName": "BERNARD",
+                    "LastName": "GRESOLA"
+                }
               }
             );
-            
+            console.log(response);
             const responseJson = await response.json();
             
             if(responseJson.length > 0) {
@@ -794,6 +729,7 @@
             }
             return responseJson;
           }, 
+          
         },
       });
     </script>

@@ -38,6 +38,9 @@
             <b class="fa fa-check-circle" style="font-size:13rem"></b>
             <h3>{{name}}</h3>
             <h4>{{date}}</h4>
+            <div v-if="isUndergoneTriage">
+              <h3>Temperature: {{isUndergoneTriageTemp}}</h3>
+            </div>
             <p>KINDLY OBSERVE THE FOLLOWING:
               <ul style="list-style-type:none;">
                 <li>Wear a mask at all times</li>
@@ -51,6 +54,10 @@
             <b class="fa fa-exclamation-circle" style="font-size:13rem"></b>
             <h3>{{name}}</h3>
             <h4>{{date}}</h4>
+            <div v-if="isUndergoneTriage">
+              <h3>Temperature: {{isUndergoneTriageTemp}}</h3>
+              <h3>Symptoms: {{isUndergoneTriageSymptoms}}</h3>
+            </div>
             <p>KINDLY OBSERVE THE FOLLOWING:
               <ul style="list-style-type:none;">
                 <li>Wear a mask at all times</li>
@@ -348,6 +355,9 @@
           covidCleared: '',
           isUserExist: false,
           isSuccessfullRegistration: false,
+          isUndergoneTriage: false,
+          isUndergoneTriageTemp: '',
+          isUndergoneTriageSymptoms: '',
           apps: [
             { name: "Employees", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
             //{ name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
@@ -538,7 +548,6 @@
               this.textColor = 'text-color';
             }
 
-            
             this.showStatus = true;
             this.currentScreen = 0;
             this.isAuthenticated = false;
@@ -583,7 +592,9 @@
             this.isFormLoading =  false;
             this.textColor =  '';
             this.covidCleared =  '';
-            
+            this.isUndergoneTriage = false;
+            this.isUndergoneTriageTemp = '',
+            this.isUndergoneTriageSymptoms = '',
             this.user_details[0]['model'] = '';
             this.user_details[1]['model']  = '';
             this.user_details[2]['model']  = ''; 
@@ -656,7 +667,11 @@
             if(checkVisit['result'].length > 0) {
               if(checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7)
               {
-                
+                this.isUndergoneTriage = true;
+                this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
+                symptoms = checkVisit['result'][0]['symptoms'];
+                resSymptoms = symptoms.replace(/\_/g, ' ');
+                this.isUndergoneTriageSymptoms = resSymptoms.toUpperCase();
                 this.isForCovidEr = true;
                 this.covidCleared = 'bg-danger';
                 this.textColor = 'text-color';
@@ -665,6 +680,8 @@
                 this.isAuthenticated = false;
                 this.currentPage = '/';
               } else {
+                this.isUndergoneTriage = true;
+                this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
                 this.isForCovidEr = false;
                 this.covidCleared = 'bg-success';
                 this.textColor = 'text-color';

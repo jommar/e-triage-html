@@ -84,7 +84,7 @@
                 
               >
                 <h1 class="display-2"><b v-bind:class="app.icon"></b></h1>
-                <h2>{{app.name}}</h2>
+                <h2 class="text-center">{{app.name}}</h2>
               </a>
             </div>
           </div>
@@ -289,7 +289,7 @@
           class="card"
           v-if="currentPage == '/employees' && !isAuthenticated"
         >
-          <h3 class="card-header">Employees</h3>
+          <h3 class="card-header">Employees / Residents / Consultants</h3>
           <div class="card-body">
             <label class="w-100">
               <b>Employee ID Number</b>
@@ -359,7 +359,7 @@
           isUndergoneTriageTemp: '',
           isUndergoneTriageSymptoms: '',
           apps: [
-            { name: "Employees", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
+            { name: "Employees / Residents / Consultants", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
             //{ name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
           ],
 

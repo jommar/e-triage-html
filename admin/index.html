@@ -1,5 +1,6 @@
 <html>
-  <head>
+
+<head>
     <title>UERM E-Triage</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../jquery/jquery.min.js"></script>
@@ -9,12 +10,15 @@
     <script src="../vue/vue.js"></script>
     <script src="../javascripts/md5.js"></script>
     <style>
-        body,html{
+        body,
+        html {
             height: 100% !important;
         }
+
         .item.active {
             background-color: rgba(166, 220, 255, 0.5);
         }
+
         .item {
             cursor: pointer;
         }
@@ -22,13 +26,14 @@
         .text-color {
             color: white;
         }
-        #vue-app{
-            overflow:auto;
+
+        #vue-app {
+            overflow: auto;
         }
 
         @media screen and (min-width: 1024px) {
-            myNewDivHeight{
-                height:250px;
+            myNewDivHeight {
+                height: 250px;
             }
         }
     </style>
@@ -36,181 +41,105 @@
 
 <body>
     <div id="vue-app" class="h-100">
-    <header>
-        <div class="navbar navbar-dark bg-primary shadow-sm">
-            <div class="container d-flex justify-content-between">
-                <a href="#" class="navbar-brand d-flex align-items-center">
-                    <strong>ETriage</strong>
-                </a>
+        <header>
+            <div class="navbar navbar-dark bg-primary shadow-sm">
+                <div class="container d-flex justify-content-between">
+                    <a href="#" class="navbar-brand d-flex align-items-center">
+                        <strong>ETriage Main Dashboard</strong>
+                    </a>
+                </div>
             </div>
-        </div>
-    </header>
+        </header>
+        <main role="main">
+            <div v-if="!isDataLoaded" class="py-5 text-center">
 
-    <main role="main">
-
-        <div class="album py-5 bg-light">
-            <div class="container">
-                <h2 class="text-center"> ETriage Dashboard </h2>
-                <br>
+                <div>
+                    <b class="fa fa-spinner fa-spin fa-5x"></b>
+                </div>
+                <div>
+                    <p>
+                        FETCHING DATA ...
+                    </p>
+                </div>
+            </div>
+            <div class="container py-5" v-if="isDataLoaded">
                 <div class="row">
-                    <div class="col-md-12 text-center">
-                        <a href="/components/employees/"  style="text-decoration: none;color: #000;">
-                            <div class="card mb-4 shadow-sm">
-
-                                <div class="bd-placeholder-img card-img-top bg-primary" width="100%"
-                                    style="height:260px">
-                                    <div class="text-center">
-                                        <i style="font-size: 900%;padding-top: 4%;color:#FFF"
-                                            class="fa fa-hospital-o"> 
-                                        </i>
-                                        <h1 style="color: #FFF; padding:15px"> {{eTriageEmployeeCountToday}}</h1>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <p class="card-text text-center">Employee Triage Today</p>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <div class="col-md-6 text-center myNewDivHeight">
-                        <h2>Census by Class</h2> 
-                        <div class="col-md-12 text-center" v-for="eTriageByClassCount in eTriageByClassCountToday">
-                            <a href="/components/employees/"  style="text-decoration: none;color: #000;">
-                                <div class="card mb-4 shadow-sm">
-
-                                    <div class="bd-placeholder-img card-img-top bg-primary" width="100%"
-                                        style="height:280px">
-                                        <div class="text-center">
-                                            <i style="font-size: 900%;padding-top: 10%;color:#FFF"
-                                                class="fa fa-users"> 
-                                            </i>
-                                            <h1 style="color: #FFF; padding:10px"> {{eTriageByClassCount['']}}</h1>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="card-text text-center">{{eTriageByClassCount['class']}}</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 text-center">
-                        <h2>Census by Gender</h2> 
-                        <div class="col-md-12 text-center" v-for="eTriageByGenderCount in eTriageByGenderCountToday">
-                            <a href="/components/employees/"  style="text-decoration: none;color: #000;">
-                                <div class="card mb-4 shadow-sm">
-
-                                    <div class="bd-placeholder-img card-img-top bg-primary" width="100%"
-                                        style="height:280px">
-                                        <div class="text-center">
-                                            <i style="font-size: 900%;padding-top: 10%;color:#FFF"
-                                                class="fa fa-users"> 
-                                            </i>
-                                            <h1 style="color: #FFF; padding:10px"> {{eTriageByGenderCount['']}}</h1>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="card-text text-center">
-                                            <span v-if="eTriageByGenderCount['gender'] === null">
-                                                N/A
-                                            </span>
-                                            <span v-else-if="eTriageByGenderCount['gender'] === 'F'">
-                                                FEMALE
-                                            </span>
-                                            <span v-else-if="eTriageByGenderCount['gender'] === 'M'">
-                                                MALE
-                                            </span>
-                                        </p>
-                                    </div>
-                                </div>
+                    <div class="col-sm-6" v-for="app in apps">
+                        <div class="position-relative rounded" v-bind:class="[app.background]"
+                            style="padding-top: 100%;">
+                            <a v-bind:href="app.route"
+                                class="position-absolute d-flex align-items-center justify-content-center flex-column"
+                                style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;">
+                                <h1 class="display-2"><b v-bind:class="app.icon"></b></h1>
+                                <h2 class="text-center">{{app.name}}</h2>
+                                <h3> Today: {{app.count}}</h3>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-    </main>
-
+        </main>
     </div>
 
     <script>
         const vue = new Vue({
-        el: "#vue-app",
+            el: "#vue-app",
             data: {
                 apiUrl: "https://apps.uerm.edu.ph:3443/",
                 apiKey: "7190WHUt7gzKgrRURMnoS4D7tX6Xp112",
-                eTriageEmployeeCountDetailedToday: '',
-                eTriageEmployeeCountToday: '',
-                eTriageByGenderDetailedToday: '',
-                eTriageByGenderCountToday: '',
-                eTriageByClassDetailedToday: '',
-                eTriageByClassCountToday: '',
-            }, 
+                eTriageVisitorsCountToday: '',
+                eTriageEmployeesCountToday: '',
+                apps: [
+                    { name: "Employees / Residents / Consultants", route: "/admin/employees", icon: "fa fa-user", background: "bg-primary", count: '' },
+                    { name: 'Visitors', route: '/admin/visitors', icon: "fa fa-users", background: "bg-danger", count: '1231' },
+                ],
+                isDataLoaded: false,
+            },
+
             created() {
-                this.eTriageCountToday();
-                this.eTriageCountTodayByClass();
-                this.eTriageCountTodayByGender();
+                this.eTriageCountTodayVisitors();
+                this.eTriageCountTodayEmployees();
             },
             methods: {
-                async eTriageCountToday() {
-                    this.isFormLoading = true;
+                async eTriageCountTodayEmployees() {
+                    this.isDataLoaded = true;
 
                     const response = await fetch(
-                    `${this.apiUrl}etriage/dashboard-etriage-today?auth=${this.apiKey}`,
+                        `${this.apiUrl}etriage/dashboard-etriage-today?auth=${this.apiKey}`,
                         {
-                        method: "GET",
-                        headers: { "Content-Type": "application/json" },
+                            method: "GET",
+                            headers: { "Content-Type": "application/json" },
                         }
                     );
                     const responseJson = await response.json();
-                    
-                    if(responseJson.length > 0) {
+
+                    if (responseJson.length > 0) {
                         this.showStatus = true;
                     }
 
-                    this.eTriageEmployeeCountToday = responseJson.length;
+                    this.apps[1]['count'] = responseJson.length;
                 },
-                async eTriageCountTodayByClass() {
-                    this.isFormLoading = true;
+                async eTriageCountTodayVisitors() {
 
                     const response = await fetch(
-                    `${this.apiUrl}etriage/dashboard-etriage-by-class?auth=${this.apiKey}`,
+                        `${this.apiUrl}etriage/dashboard-etriage-today?auth=${this.apiKey}`,
                         {
-                        method: "GET",
-                        headers: { "Content-Type": "application/json" },
+                            method: "GET",
+                            headers: { "Content-Type": "application/json" },
                         }
                     );
                     const responseJson = await response.json();
-                    
-                    if(responseJson.length > 0) {
+
+                    if (responseJson.length > 0) {
                         this.showStatus = true;
                     }
 
-                    this.eTriageByClassCountToday = responseJson;
-                },
-                async eTriageCountTodayByGender() {
-                    this.isFormLoading = true;
+                    this.apps[0]['count'] = responseJson.length;
 
-                    const response = await fetch(
-                    `${this.apiUrl}etriage/dashboard-etriage-by-gender?auth=${this.apiKey}`,
-                        {
-                        method: "GET",
-                        headers: { "Content-Type": "application/json" },
-                        }
-                    );
-                    const responseJson = await response.json();
-                    
-                    if(responseJson.length > 0) {
-                        this.showStatus = true;
-                    }
-
-                    this.eTriageByGenderCountToday = responseJson;
                 },
             },
         });
     </script>
-    </body>
+</body>
+
 </html>

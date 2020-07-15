@@ -1,817 +1,778 @@
 <html>
-  <head>
-    <title>UERM E-Triage</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="jquery/jquery.min.js"></script>
-    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css" />
-    <script src="bootstrap/js/bootstrap.js"></script>
-    <script src="vue/vue.js"></script>
-    <script src="javascripts/md5.js"></script>
-    <style>
-      body,html{
-        height: 100% !important;
-      }
-      .item.active {
-        background-color: rgba(166, 220, 255, 0.5);
-      }
-      .item {
-        cursor: pointer;
-      }
 
-      .text-color {
-        color: white;
-      }
-      #vue-app{
-        overflow:auto;
-      }
-    </style>
-  </head>
+<head>
+  <title>UERM E-Triage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="jquery/jquery.min.js"></script>
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css" />
+  <script src="bootstrap/js/bootstrap.js"></script>
+  <script src="vue/vue.js"></script>
+  <script src="javascripts/md5.js"></script>
+  <style>
+    body,
+    html {
+      height: 100% !important;
+    }
 
-  <body>
-    <div id="vue-app" class="h-100" v-bind:class="[covidCleared, textColor]">
-      <h1 class="mb-3 bg-primary p-3 text-white">UERM E-Triage</h1>
-      <div class="container-fluid py-5">
-        <div v-if="showStatus" class="text-center">
-          <div v-if="!isForCovidEr">
-            <h1>You may now enter the UERM premises.</h1>
-            <b class="fa fa-check-circle" style="font-size:13rem"></b>
-            <h3>{{name}}</h3>
-            <h4>{{date}}</h4>
-            <div v-if="isUndergoneTriage">
-              <h3>Temperature: {{isUndergoneTriageTemp}}</h3>
-            </div>
-            <p>KINDLY OBSERVE THE FOLLOWING:
-              <ul style="list-style-type:none;">
-                <li>Wear a mask at all times</li>
-                <li>Observe physical distancing</li>
-                <li>Wash or sanitize your hands regularly</li>
-              </ul>
-            </p>
+    .item.active {
+      background-color: rgba(166, 220, 255, 0.5);
+    }
+
+    .item {
+      cursor: pointer;
+    }
+
+    .text-color {
+      color: white;
+    }
+
+    #vue-app {
+      overflow: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="vue-app" class="h-100" v-bind:class="[covidCleared, textColor]">
+    <h1 class="mb-3 bg-primary p-3 text-white">UERM E-Triage</h1>
+    <div class="container-fluid py-5">
+      <div v-if="showStatus" class="text-center">
+        <div v-if="!isForCovidEr">
+          <h1>You may now enter the UERM premises.</h1>
+          <b class="fa fa-check-circle" style="font-size:13rem"></b>
+          <h3>{{name}}</h3>
+          <h4>{{date}}</h4>
+          <div v-if="isUndergoneTriage">
+            <h3>Temperature: {{isUndergoneTriageTemp}}</h3>
           </div>
-          <div v-if="isForCovidEr">
-            <h1>Please proceed to COVID ER for proper evaluation and management.</h1>
-            <b class="fa fa-exclamation-circle" style="font-size:13rem"></b>
-            <h3>{{name}}</h3>
-            <h4>{{date}}</h4>
-            <div v-if="isUndergoneTriage">
-              <h3>Temperature: {{isUndergoneTriageTemp}}</h3>
-              <h3>Symptoms: {{isUndergoneTriageSymptoms}}</h3>
+          <p>KINDLY OBSERVE THE FOLLOWING:
+          <ul style="list-style-type:none;">
+            <li>Wear a mask at all times</li>
+            <li>Observe physical distancing</li>
+            <li>Wash or sanitize your hands regularly</li>
+          </ul>
+          </p>
+        </div>
+        <div v-if="isForCovidEr">
+          <h1>Please proceed to COVID ER for proper evaluation and management.</h1>
+          <b class="fa fa-exclamation-circle" style="font-size:13rem"></b>
+          <h3>{{name}}</h3>
+          <h4>{{date}}</h4>
+          <div v-if="isUndergoneTriage">
+            <h3>Temperature: {{isUndergoneTriageTemp}}</h3>
+            <h3>Symptoms:</h3>
+            <span v-for="symptom in isUndergoneTriageSymptoms.split(';')" class="badge badge-primary mx-1">
+              {{symptom}}
+            </span>
+          </div>
+          <p>KINDLY OBSERVE THE FOLLOWING:
+          <ul style="list-style-type:none;">
+            <li>Wear a mask at all times</li>
+            <li>Observe physical distancing</li>
+            <li>Wash or sanitize your hands regularly</li>
+          </ul>
+          </p>
+        </div>
+
+        <div class="text-center">
+          <button class="btn btn-outline-light" v-on:click="initValues"><b class="fa fa-arrow-left"></b> Go
+            Back</button>
+        </div>
+
+      </div>
+
+      <div class="row" v-if="currentPage == '/' && !showStatus">
+        <div class="col-sm-6" v-for="app in apps">
+          <div class="position-relative rounded" v-bind:class="[app.background]" style="padding-top: 100%;">
+            <a v-on:click="setPage(app.route)" href="#"
+              class="position-absolute d-flex align-items-center justify-content-center flex-column"
+              style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;">
+              <h1 class="display-2"><b v-bind:class="app.icon"></b></h1>
+              <h2 class="text-center">{{app.name}}</h2>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="isUserExist && currentScreen == 0" class="text-center">
+        <h1>You are already registered to ETriage</h1>
+        <h3>{{name}}</h3>
+        <h3>Please remember you code</h3>
+        <br>
+        <h3><em>{{empForm.code}}</em></h3>
+
+        <button v-on:click="continueScreen" class="btn btn-primary btn-sm">
+          <span>Continue</span>
+        </button>
+      </div>
+
+      <div class="text-center" v-if="isSuccessfullRegistration && currentScreen == 0">
+        <h1>You successfully registered to ETriage</h1>
+
+        <h3>{{name}}</h3>
+
+        <h3>Please remember your code</h3>
+        <br>
+        <h3><em>{{empForm.code}}</em></h3>
+        <button v-on:click="continueScreen" class="btn btn-primary btn-sm">
+          <span>Continue</span>
+        </button>
+      </div>
+
+      <div v-if="isAuthenticated" class="form-container">
+        <div v-if="currentScreen == 1">
+          <h3 class="text-center">COVID-19 HEALTH DECLARATION FORM</h3>
+          <p class="lead">
+            In line with the Republic Act 11332 "Mandatory Reporting of
+            Notifiable Diseases and Health Events of Public Health Concern Act",
+            and to assure the safety and protection of the general public,
+            please fill out this HEALTH DECLARATION FORM truthfully. This
+            required information will be used in accordance with the law. Any
+            incorrect information provided will be dealth with accordingly.
+            Submit yourself for temperature checking and recording, and procedd
+            to completing the information. Thank you.
+          </p>
+        </div>
+
+        <div v-if="currentScreen == 2">
+          <div class="lead alert alert-info">
+            Please click on the symptoms that you are currently experiencing.
+            Click Continue to proceed.
+          </div>
+          <div v-for="(symptom, index) in symptoms" class="p-3 border-bottom border-dark item d-flex align-items-center"
+            v-on:click="toggleSymptom(index)" v-bind:class="{active:symptom.isActive}">
+            <div class="flex-grow-1">
+              <h4>{{symptom.english}}</h4>
+              <div>{{symptom.tagalog}}</div>
             </div>
-            <p>KINDLY OBSERVE THE FOLLOWING:
-              <ul style="list-style-type:none;">
-                <li>Wear a mask at all times</li>
-                <li>Observe physical distancing</li>
-                <li>Wash or sanitize your hands regularly</li>
-              </ul>
-            </p>
+            <div style="width:100px" class="text-center">
+              <a href="#" class="badge" v-bind:class="{'badge-primary':symptom.isActive}">Yes</a>
+              <a href="#" class="badge" v-bind:class="{'badge-primary':!symptom.isActive}">No</a>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentScreen == 3">
+          <div class="lead alert alert-info">
+            Please click on the following items regarding your history of
+            exposure. Click Continue to proceed.
+          </div>
+          <div v-for="(history, index) in histories"
+            class="p-3 border-bottom border-dark item d-flex align-items-center" v-on:click="toggleHistory(index)"
+            v-bind:class="{active:history.isActive}">
+            <div class="flex-grow-1">
+              <h4>{{history.english}}</h4>
+              <div>{{history.tagalog}}</div>
+            </div>
+            <div style="width:100px" class="text-center">
+              <a href="#" class="badge" v-bind:class="{'badge-primary':history.isActive}">Yes</a>
+              <a href="#" class="badge" v-bind:class="{'badge-primary':!history.isActive}">No</a>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentScreen == 4">
+          <label class="full-width p-3 border-bottom border-dark w-100">
+            <b>Temperature</b>
+            <input type="text" class="form-control" v-model="temperature" placeholder="Temperature" />
+          </label>
+
+          <div class="d-flex align-items-center border-bottom border-dark item">
+            <div v-on:click="isTermsAccepted = !isTermsAccepted">
+              I, {{name}} certify that the information I have given is true,
+              correct, and complete. I understand that failure to answer any
+              question or giving false answer can be penalized in accordance
+              with law. I voluntarily and freely consent to the collection,
+              processing, sharing and storage of the above personal information
+              with the Data Privacy Act of 2012 and it's implementing Rules and
+              Regulations.
+            </div>
+            <div class="ml-3">
+              <input type="checkbox" style="width: 30px; height: 30px;" v-model="isTermsAccepted" />
+            </div>
           </div>
 
+          <div class="my-2 alert alert-danger" v-if="formErrorMessage != null">
+            {{formErrorMessage}}
+          </div>
+        </div>
+
+        <div class="text-center mt-3">
+          <div class="btn-group">
+            <button v-if="currentScreen > 0" v-on:click="changeScreen('+')" class="btn btn-primary btn-sm">
+              <span v-if="currentScreen < 4">Continue</span>
+              <span v-if="currentScreen >= 4"><b class="fa fa-save"></b> Submit</span>
+            </button>
+            <button v-if="currentScreen > 0" v-on:click="changeScreen('-')" class="btn btn-outline-primary btn-sm">
+              Back
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" v-if="currentPage == '/visitors' && !showStatus">
+        <div class="col-sm-12">
           <div class="text-center">
-            <button class="btn btn-outline-light" v-on:click="initValues"><b class="fa fa-arrow-left"></b> Go Back</button>
+            <button class="btn btn-outline-dark" v-on:click="initValues"><b class="fa fa-arrow-left"></b> Go
+              Back</button>
+            <br>
+            <br>
           </div>
-
         </div>
-
-        <div class="row" v-if="currentPage == '/' && !showStatus">
-          <div class="col-sm-6" v-for="app in apps">
-            <div class="position-relative rounded" v-bind:class="[app.background]" style="padding-top: 100%;">
-              <a
-                v-on:click="setPage(app.route)"
-                href="#"
-                class="position-absolute d-flex align-items-center justify-content-center flex-column"
-                style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;"
-                
-              >
-                <h1 class="display-2"><b v-bind:class="app.icon"></b></h1>
-                <h2 class="text-center">{{app.name}}</h2>
-              </a>
-            </div>
+        <div class="col-sm-6" v-for="other_user in other_users">
+          <div class="position-relative" v-bind:class="[other_user.background]" style="padding-top: 100%;">
+            <a v-on:click="setPage(other_user.route)" href="#"
+              class="position-absolute d-flex align-items-center justify-content-center flex-column"
+              style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;">
+              <h1 class="display-2"><b v-bind:class="other_user.icon"></b></h1>
+              <h2>{{other_user.name}}</h2>
+            </a>
           </div>
         </div>
 
-        <div v-if="isUserExist && currentScreen == 0" class="text-center">
-          <h1>You are already registered to ETriage</h1>
-          <h3>{{name}}</h3> 
-          <h3>Please remember you code</h3> 
-          <br>
-          <h3><em>{{empForm.code}}</em></h3>
+      </div>
 
-          <button
-            v-on:click="continueScreen"
-            class="btn btn-primary btn-sm"
-          >
-            <span>Continue</span>
-          </button>
-        </div>
-
-        <div class="text-center" v-if="isSuccessfullRegistration && currentScreen == 0">
-          <h1>You successfully registered to ETriage</h1>
-          
-          <h3>{{name}}</h3> 
-
-          <h3>Please remember your code</h3> 
-          <br> 
-          <h3><em>{{empForm.code}}</em></h3>
-          <button
-            v-on:click="continueScreen"
-            class="btn btn-primary btn-sm"
-          >
-            <span>Continue</span>
-          </button>
-        </div>
-
-        <div v-if="isAuthenticated" class="form-container">
-          <div v-if="currentScreen == 1">
-            <h3 class="text-center">COVID-19 HEALTH DECLARATION FORM</h3>
-            <p class="lead">
-              In line with the Republic Act 11332 "Mandatory Reporting of
-              Notifiable Diseases and Health Events of Public Health Concern Act",
-              and to assure the safety and protection of the general public,
-              please fill out this HEALTH DECLARATION FORM truthfully. This
-              required information will be used in accordance with the law. Any
-              incorrect information provided will be dealth with accordingly.
-              Submit yourself for temperature checking and recording, and procedd
-              to completing the information. Thank you.
-            </p>
-          </div>
-
-          <div v-if="currentScreen == 2">
-            <div class="lead alert alert-info">
-              Please click on the symptoms that you are currently experiencing.
-              Click Continue to proceed.
-            </div>
-            <div
-              v-for="(symptom, index) in symptoms"
-              class="p-3 border-bottom border-dark item d-flex align-items-center"
-              v-on:click="toggleSymptom(index)"
-              v-bind:class="{active:symptom.isActive}"
-            >
-              <div class="flex-grow-1">
-                <h4>{{symptom.english}}</h4>
-                <div>{{symptom.tagalog}}</div>
-              </div>
-              <div style="width:100px" class="text-center">
-                <a href="#" class="badge" v-bind:class="{'badge-primary':symptom.isActive}">Yes</a>
-                <a href="#" class="badge" v-bind:class="{'badge-primary':!symptom.isActive}">No</a>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="currentScreen == 3">
-            <div class="lead alert alert-info">
-              Please click on the following items regarding your history of
-              exposure. Click Continue to proceed.
-            </div>
-            <div
-              v-for="(history, index) in histories"
-              class="p-3 border-bottom border-dark item d-flex align-items-center"
-              v-on:click="toggleHistory(index)"
-              v-bind:class="{active:history.isActive}"
-            >
-              <div class="flex-grow-1">
-                <h4>{{history.english}}</h4>
-                <div>{{history.tagalog}}</div>
-              </div>
-              <div style="width:100px" class="text-center">
-                <a href="#" class="badge" v-bind:class="{'badge-primary':history.isActive}">Yes</a>
-                <a href="#" class="badge" v-bind:class="{'badge-primary':!history.isActive}">No</a>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="currentScreen == 4">
-            <label class="full-width p-3 border-bottom border-dark w-100">
-              <b>Temperature</b>
-              <input
-                type="text"
-                class="form-control"
-                v-model="temperature"
-                placeholder="Temperature"
-              />
-            </label>
-
-            <div class="d-flex align-items-center border-bottom border-dark item">
-              <div v-on:click="isTermsAccepted = !isTermsAccepted">
-                I, {{name}} certify that the information I have given is true,
-                correct, and complete. I understand that failure to answer any
-                question or giving false answer can be penalized in accordance
-                with law. I voluntarily and freely consent to the collection,
-                processing, sharing and storage of the above personal information
-                with the Data Privacy Act of 2012 and it's implementing Rules and
-                Regulations.
-              </div>
-              <div class="ml-3">
-                <input type="checkbox" style="width: 30px; height: 30px;" v-model="isTermsAccepted" />
-              </div>
-            </div>
-
-            <div class="my-2 alert alert-danger" v-if="formErrorMessage != null">
-              {{formErrorMessage}}
-            </div>
-          </div>
-
-          <div class="text-center mt-3">
-            <div class="btn-group">
-              <button v-if="currentScreen > 0"
-                v-on:click="changeScreen('+')"
-                class="btn btn-primary btn-sm"
-              >
-                <span v-if="currentScreen < 4">Continue</span>
-                <span v-if="currentScreen >= 4"
-                  ><b class="fa fa-save"></b> Submit</span
-                >
-              </button>
-              <button v-if="currentScreen > 0"
-                v-on:click="changeScreen('-')"
-                class="btn btn-outline-primary btn-sm"
-              >
-                Back
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="row" v-if="currentPage == '/visitors' && !showStatus">
-          <div class="col-sm-12">
-            <div class="text-center">
-              <button class="btn btn-outline-dark" v-on:click="initValues"><b class="fa fa-arrow-left"></b> Go Back</button>
-              <br>
-              <br>
-            </div>
-          </div>
-          <div class="col-sm-6" v-for="other_user in other_users">
-            <div class="position-relative" v-bind:class="[other_user.background]" style="padding-top: 100%;">
-              <a
-                v-on:click="setPage(other_user.route)"
-                href="#"
-                class="position-absolute d-flex align-items-center justify-content-center flex-column"
-                style="top: 0; bottom: 0; left: 0; right: 0;color:#FFF;text-decoration: none;"
-              >
-                <h1 class="display-2"><b v-bind:class="other_user.icon"></b></h1>
-                <h2>{{other_user.name}}</h2>
-              </a>
-            </div>
-          </div>
-          
-        </div>
-
-        <div v-if="currentPage == '/register' && !isAuthenticated && !isUserExist && !isSuccessfullRegistration">
-          <form class="card" v-on:submit.prevent="registerUser">
-            <h3 class="card-header">Register</h3>
-            <div class="card-body">
-              <div v-for="user_detail in user_details">
-
-                <label class="w-100">
-                  <b>{{user_detail.placeholder}}</b>
-                  <input type="text" class="form-control" v-model="user_detail.model" :name="[user_detail.name]" :placeholder="[user_detail.placeholder]">
-                </label>
-
-              </div>
-
-              <div v-if="!isFormLoading" class="btn-group">
-                <button class="btn btn-primary">
-                  <b class="fa fa-save"></b> Submit
-                </button>
-                <button type="button" v-on:click="initValues" class="btn btn-outline-dark">Back</button>
-              </div>
-              <b v-if="isFormLoading" class="p-3 fa fa-spinner fa-spin"></b>
-
-            </div>
-          </form>
-        </div>
-
-        <form
-          v-on:submit.prevent="loginEmployee"
-          class="card"
-          v-if="currentPage == '/employees' && !isAuthenticated"
-        >
-          <h3 class="card-header">Employees / Residents / Consultants</h3>
+      <div v-if="currentPage == '/register' && !isAuthenticated && !isUserExist && !isSuccessfullRegistration">
+        <form class="card" v-on:submit.prevent="registerUser">
+          <h3 class="card-header">Register</h3>
           <div class="card-body">
-            <label class="w-100">
-              <b>Employee ID Number</b>
-              <input
-                type="text"
-                required
-                class="form-control"
-                placeholder="Employee ID Number"
-                name="code"
-                v-model="empForm.code"
-              />
-            </label>
-            <label class="w-100">
-              <b>Password</b>
-              <input
-                type="password"
-                required
-                class="form-control"
-                placeholder="Password"
-                name="password"
-                v-model="empForm.password"
-              />
-            </label>
-            <div class="my-2 alert alert-danger" v-if="formErrorMessage != null">
-              {{formErrorMessage}}
+            <div v-for="user_detail in user_details">
+
+              <label class="w-100">
+                <b>{{user_detail.placeholder}}</b>
+                <input type="text" class="form-control" v-model="user_detail.model" :name="[user_detail.name]"
+                  :placeholder="[user_detail.placeholder]">
+              </label>
+
             </div>
-            <div>
-              <div v-if="!isFormLoading" class="btn-group">
-                <button class="btn btn-primary">
-                  <b class="fa fa-sign-in"></b> Login
-                </button>
-                <button type="button" v-on:click="initValues" class="btn btn-outline-dark">Back</button>
-              </div>
-              <b v-if="isFormLoading" class="p-3 fa fa-spinner fa-spin"></b>
+
+            <div v-if="!isFormLoading" class="btn-group">
+              <button class="btn btn-primary">
+                <b class="fa fa-save"></b> Submit
+              </button>
+              <button type="button" v-on:click="initValues" class="btn btn-outline-dark">Back</button>
             </div>
+            <b v-if="isFormLoading" class="p-3 fa fa-spinner fa-spin"></b>
+
           </div>
         </form>
       </div>
-    </div>
 
-    <script>
-      const vue = new Vue({
-        el: "#vue-app",
-        data: {
-          isAuthenticated: false,
-          apiUrl: "https://apps.uerm.edu.ph:3443/",
-          apiKey: "7190WHUt7gzKgrRURMnoS4D7tX6Xp112",
-          currentPage: "/",
-          currentScreen: 0,
-          empForm: {
+      <form v-on:submit.prevent="loginEmployee" class="card" v-if="currentPage == '/employees' && !isAuthenticated">
+        <h3 class="card-header">Employees / Residents / Consultants</h3>
+        <div class="card-body">
+          <label class="w-100">
+            <b>Employee ID Number</b>
+            <input type="text" required class="form-control" placeholder="Employee ID Number" name="code"
+              v-model="empForm.code" />
+          </label>
+          <label class="w-100">
+            <b>Password</b>
+            <input type="password" required class="form-control" placeholder="Password" name="password"
+              v-model="empForm.password" />
+          </label>
+          <div class="my-2 alert alert-danger" v-if="formErrorMessage != null">
+            {{formErrorMessage}}
+          </div>
+          <div>
+            <div v-if="!isFormLoading" class="btn-group">
+              <button class="btn btn-primary">
+                <b class="fa fa-sign-in"></b> Login
+              </button>
+              <button type="button" v-on:click="initValues" class="btn btn-outline-dark">Back</button>
+            </div>
+            <b v-if="isFormLoading" class="p-3 fa fa-spinner fa-spin"></b>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const vue = new Vue({
+      el: "#vue-app",
+      data: {
+        isAuthenticated: false,
+        apiUrl: "https://apps.uerm.edu.ph:3443/",
+        apiKey: "7190WHUt7gzKgrRURMnoS4D7tX6Xp112",
+        currentPage: "/",
+        currentScreen: 0,
+        empForm: {
+          code: "",
+          password: "",
+        },
+        date: new Date().toDateString(),
+        isForCovidEr: false,
+        showStatus: false,
+        name: null,
+        isTermsAccepted: false,
+        temperature: 0,
+        formErrorMessage: null,
+        isFormLoading: false,
+        textColor: '',
+        covidCleared: '',
+        isUserExist: false,
+        isSuccessfullRegistration: false,
+        isUndergoneTriage: false,
+        isUndergoneTriageTemp: '',
+        isUndergoneTriageSymptoms: '',
+        apps: [
+          { name: "Employees / Residents / Consultants", route: "/employees", icon: "fa fa-user", background: "bg-primary" },
+          //{ name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
+        ],
+
+        other_users: [
+          { name: "Register", route: "/register", icon: "fa fa-user-plus", background: "bg-info" },
+
+        ],
+        user_details: [
+          {
+            name: "firstName",
+            placeholder: "First Name",
+            model: "",
+          },
+          {
+            name: "middleInitial",
+            placeholder: "Middle Initial",
+            model: "",
+          },
+          {
+            name: "lastName",
+            placeholder: "Last Name",
+            model: "",
+          },
+          {
+            name: "address",
+            placeholder: "Address",
+            model: "",
+          },
+          {
+            name: "contactNo",
+            placeholder: "Contact #",
+            model: "",
+          },
+
+          {
+            name: "remarks",
+            placeholder: "Purpose",
+            model: "",
+          },
+        ],
+        symptoms: [
+          {
+            code: "fever",
+            english: "Fever",
+            tagalog: "Lagnat",
+            isActive: false,
+          },
+          {
+            code: "cough_colds",
+            english: "Cough or Colds",
+            tagalog: "Ubo o Sipon",
+            isActive: false,
+          },
+          {
+            code: "difficulty_breathing",
+            english: "Difficulty of Breathing",
+            tagalog: "Kinakapos na hininga",
+            isActive: false,
+          },
+          {
+            code: "headache",
+            english: "Headache",
+            tagalog: "Sakit ng Ulo",
+            isActive: false,
+          },
+          {
+            code: "sore_throat",
+            english: "Sore Throat",
+            tagalog: "Namamagang Lalamunan",
+            isActive: false,
+          },
+          {
+            code: "joint_pains",
+            english: "Joint Pains",
+            tagalog: "Sakit sa Kasu-kasuan",
+            isActive: false,
+          },
+          {
+            code: "stomach_ache_diarrhea",
+            english: "Stomach Ache / Diarrhea",
+            tagalog: "Sakit sa Tyan / Pagtatae",
+            isActive: false,
+          },
+          {
+            code: "sense_of_smell_taste",
+            english:
+              "New onset less or decreased sense of smell and or taste",
+            tagalog: "Kawalan ng pang-amoy o panlasa",
+            isActive: false,
+          },
+        ],
+        histories: [
+          {
+            code: "travel_14_days",
+            english:
+              "Travel in the past 14 days with local transmission of COVID-19",
+            tagalog:
+              "Paglalakbay sa nakaraang 14 na araw sa lugar na may local na hawaan ng COVID-19",
+            isActive: false,
+          },
+          {
+            code: "person_with_travel_history",
+            english:
+              "Exposure to person with history of travel with local transmission of COVID-19",
+            tagalog:
+              "Pagkalantad sa taong naglakbay sa lugar na may local na hawaan ng COVID-19",
+            isActive: false,
+          },
+          {
+            code: "exposure_to_individuals",
+            english:
+              "Exposure to cluster of Individuals with flu-like illness inn household or workplace",
+            tagalog:
+              "Pagkalantad sa grupo ng mga indibidwal na may sakit na tulad ng trangkaso sa bahay o opisina",
+            isActive: false,
+          },
+          {
+            code: "exposure_to_confirmed_case",
+            english: "Exposure to a confirmed case of COVID-19",
+            tagalog: "Pagkalantad sa isang kumpirmadong kaso ng COVID-19",
+            isActive: false,
+          },
+          {
+            code: "exposed_to_pui",
+            english:
+              "Exposure to a Probable and/or Suspected case of COVID-19",
+            tagalog:
+              "Pagkalantad sa isang Probable at/o Suspected case ng COVID-19",
+            isActive: false,
+          },
+        ],
+      },
+      methods: {
+        setPage(route) {
+          this.currentPage = route;
+        },
+        async saveForm() {
+          this.formErrorMessage = null;
+
+          const symptoms = this.symptoms.map((symptom) => { return symptom.isActive ? symptom.code : null }).filter((item) => { return item != null });
+          const histories = this.histories.map((history) => { return history.isActive ? history.code : null }).filter((item) => { return item != null });
+
+          const form = {
+            Temperature: this.temperature,
+            Code: this.empForm.code,
+            LastName: this.lastName,
+            FirstName: this.firstName,
+            MiddleInitial: this.middleInitial,
+            Address: this.address,
+            ContactNo: this.contactNo,
+            Purpose: this.purpose,
+            UserType: this.userType,
+
+            SymptomAndHistory_Code: [
+              ...symptoms,
+              ...histories
+            ].join(';'),
+          };
+
+          if (!this.isTermsAccepted || this.temperature < 35 || this.temperature > 42) {
+            this.formErrorMessage = 'Please provide your temperature and verify that you understand the terms and conditions.';
+            return;
+          }
+
+          const response = await fetch(
+            `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(form),
+            }
+          );
+
+          const responseJson = await response.json();
+          if (responseJson.error) {
+            this.formErrorMessage = responseJson.message;
+            return;
+          }
+
+          if (form['SymptomAndHistory_Code'] || form['Temperature'] > 37.7) {
+            this.isForCovidEr = true;
+            this.covidCleared = 'bg-danger';
+            this.textColor = 'text-color';
+          } else {
+            this.covidCleared = 'bg-success';
+            this.textColor = 'text-color';
+          }
+
+          this.showStatus = true;
+          this.currentScreen = 0;
+          this.isAuthenticated = false;
+          this.currentPage = '/';
+
+        },
+        changeScreen(type) {
+          document.querySelector('.form-container').scrollIntoView();
+          if (type == "+") {
+            if (this.currentScreen >= 4) {
+              this.saveForm();
+              return;
+            }
+            this.currentScreen++;
+          } else if (type == "-") {
+            this.currentScreen--;
+            if (this.currentScreen == 0) {
+              this.isAuthenticated = false;
+            }
+          }
+        },
+        toggleSymptom(index) {
+          this.symptoms[index].isActive = !this.symptoms[index].isActive;
+        },
+        toggleHistory(index) {
+          this.histories[index].isActive = !this.histories[index].isActive;
+        },
+        initValues() {
+          this.isAuthenticated = false;
+          this.currentPage = "/";
+          this.currentScreen = 0;
+          this.empForm = {
             code: "",
             password: "",
-          },
-          date:new Date().toDateString(),
-          isForCovidEr:false,
-          showStatus:false,
-          name:null,
-          isTermsAccepted:false,
-          temperature:0,
-          formErrorMessage: null,
-          isFormLoading: false,
-          textColor: '',
-          covidCleared: '',
-          isUserExist: false,
-          isSuccessfullRegistration: false,
-          isUndergoneTriage: false,
-          isUndergoneTriageTemp: '',
-          isUndergoneTriageSymptoms: '',
-          apps: [
-            { name: "Employees / Residents / Consultants", route: "/employees", icon: "fa fa-user", background: "bg-primary"},
-            //{ name:'Visitors',route:'/visitors', icon: "fa fa-users", background: "bg-danger"},
-          ],
+          };
+          this.isForCovidEr = false;
+          this.showStatus = false;
+          this.name = null;
+          this.isTermsAccepted = false;
+          this.temperature = 0;
+          this.formErrorMessage = null;
+          this.isFormLoading = false;
+          this.textColor = '';
+          this.covidCleared = '';
+          this.isUndergoneTriage = false;
+          this.isUndergoneTriageTemp = '',
+            this.isUndergoneTriageSymptoms = '',
+            this.user_details[0]['model'] = '';
+          this.user_details[1]['model'] = '';
+          this.user_details[2]['model'] = '';
+          this.user_details[3]['model'] = '';
+          this.user_details[4]['model'] = '';
+          this.user_details[5]['model'] = '';
 
-          other_users: [
-            { name: "Register", route: "/register", icon: "fa fa-user-plus", background: "bg-info"},
-            
-          ],
-          user_details: [
-            {
-              name: "firstName",
-              placeholder: "First Name",
-              model: "",
-            },
-            {
-              name: "middleInitial",
-              placeholder: "Middle Initial",
-              model: "",
-            },
-            {
-              name: "lastName",
-              placeholder: "Last Name",
-              model: "",
-            },
-            {
-              name: "address",
-              placeholder: "Address",
-              model: "",
-            },
-            {
-              name: "contactNo",
-              placeholder: "Contact #",
-              model: "",
-            },
-
-            {
-              name: "remarks",
-              placeholder: "Purpose",
-              model: "",
-            },
-          ],
-          symptoms: [
-            {
-              code: "fever",
-              english: "Fever",
-              tagalog: "Lagnat",
-              isActive: false,
-            },
-            {
-              code: "cough_colds",
-              english: "Cough or Colds",
-              tagalog: "Ubo o Sipon",
-              isActive: false,
-            },
-            {
-              code: "difficulty_breathing",
-              english: "Difficulty of Breathing",
-              tagalog: "Kinakapos na hininga",
-              isActive: false,
-            },
-            {
-              code: "headache",
-              english: "Headache",
-              tagalog: "Sakit ng Ulo",
-              isActive: false,
-            },
-            {
-              code: "sore_throat",
-              english: "Sore Throat",
-              tagalog: "Namamagang Lalamunan",
-              isActive: false,
-            },
-            {
-              code: "joint_pains",
-              english: "Joint Pains",
-              tagalog: "Sakit sa Kasu-kasuan",
-              isActive: false,
-            },
-            {
-              code: "stomach_ache_diarrhea",
-              english: "Stomach Ache / Diarrhea",
-              tagalog: "Sakit sa Tyan / Pagtatae",
-              isActive: false,
-            },
-            {
-              code: "sense_of_smell_taste",
-              english:
-                "New onset less or decreased sense of smell and or taste",
-              tagalog: "Kawalan ng pang-amoy o panlasa",
-              isActive: false,
-            },
-          ],
-          histories: [
-            {
-              code: "travel_14_days",
-              english:
-                "Travel in the past 14 days with local transmission of COVID-19",
-              tagalog:
-                "Paglalakbay sa nakaraang 14 na araw sa lugar na may local na hawaan ng COVID-19",
-              isActive: false,
-            },
-            {
-              code: "person_with_travel_history",
-              english:
-                "Exposure to person with history of travel with local transmission of COVID-19",
-              tagalog:
-                "Pagkalantad sa taong naglakbay sa lugar na may local na hawaan ng COVID-19",
-              isActive: false,
-            },
-            {
-              code: "exposure_to_individuals",
-              english:
-                "Exposure to cluster of Individuals with flu-like illness inn household or workplace",
-              tagalog:
-                "Pagkalantad sa grupo ng mga indibidwal na may sakit na tulad ng trangkaso sa bahay o opisina",
-              isActive: false,
-            },
-            {
-              code: "exposure_to_confirmed_case",
-              english: "Exposure to a confirmed case of COVID-19",
-              tagalog: "Pagkalantad sa isang kumpirmadong kaso ng COVID-19",
-              isActive: false,
-            },
-            {
-              code: "exposed_to_pui",
-              english:
-                "Exposure to a Probable and/or Suspected case of COVID-19",
-              tagalog:
-                "Pagkalantad sa isang Probable at/o Suspected case ng COVID-19",
-              isActive: false,
-            },
-          ],
         },
-        methods: {
-          setPage(route) {
-            this.currentPage = route;
-          },
-          async saveForm(){
-            this.formErrorMessage = null;
+        async checkDailyVisit() {
+          const form = this.empForm;
+          this.isFormLoading = true;
 
-            const symptoms = this.symptoms.map((symptom)=>{return symptom.isActive ? symptom.code : null}).filter((item)=>{return item != null});
-            const histories = this.histories.map((history)=>{return history.isActive ? history.code : null}).filter((item)=>{return item != null});
-            
-            const form = {
-              Temperature:this.temperature,
-              Code:this.empForm.code,
-              LastName:this.lastName,
-              FirstName:this.firstName,
-              MiddleInitial:this.middleInitial,
-              Address:this.address,
-              ContactNo:this.contactNo,
-              Purpose:this.purpose,
-              UserType:this.userType,
-              
-              SymptomAndHistory_Code:[
-                ...symptoms,
-                ...histories
-              ].join(';'),
-            };
-
-            if(!this.isTermsAccepted || this.temperature < 35 || this.temperature > 42){
-              this.formErrorMessage = 'Please provide your temperature and verify that you understand the terms and conditions.';
-              return;
+          const response = await fetch(
+            `${this.apiUrl}etriage/health-declaration?auth=${this.apiKey}&code=${form.code}`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
             }
-            
-            const response = await fetch(
-              `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body:JSON.stringify(form),
-              }
-            );
+          );
+          const responseJson = await response.json();
 
-            const responseJson = await response.json();
-            if(responseJson.error){
-              this.formErrorMessage = responseJson.message;
-              return;
+          if (responseJson.length > 0) {
+            this.showStatus = true;
+          }
+          return responseJson;
+        },
+        async loginEmployee(event) {
+          const form = this.empForm;
+          this.isFormLoading = true;
+          const checkVisit = await this.checkDailyVisit();
+
+          const response = await fetch(
+            `${this.apiUrl}employees/search/code?auth=${this.apiKey}&code=${form.code}`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+              // body:JSON.stringify(form),
             }
+          );
+          const responseJson = await response.json();
 
-            if(form['SymptomAndHistory_Code'] || form['Temperature'] > 37.7) {
+          if (responseJson.result.length == 0) {
+            this.isFormLoading = false;
+            this.formErrorMessage =
+              "Could not validate your credentials, make sure that you have entered a correct username/password.";
+            return;
+          }
+
+          const info = responseJson.result[0];
+
+          const days = [
+            'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+          ]
+          const currentDate = days[new Date().getDay()].toLowerCase();
+
+          if (
+            !info.PASS == MD5(form.password) &&
+            !form.password == "uerm_misd" &&
+            !form.password == `${currentDate}${form.code}`
+          ) {
+            this.isFormLoading = false;
+            this.formErrorMessage =
+              "Could not validate your credentials, make sure that you have entered a correct username/password.";
+            return;
+          }
+
+          this.name = info.NAME;
+          this.date = new Date().toDateString();
+
+          if (checkVisit['result'].length > 0) {
+            if (checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7) {
+              this.isUndergoneTriage = true;
+              this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
+              symptoms = checkVisit['result'][0]['symptoms'];
+              resSymptoms = symptoms.replace(/\_/g, ' ');
+              this.isUndergoneTriageSymptoms = resSymptoms.toUpperCase();
               this.isForCovidEr = true;
               this.covidCleared = 'bg-danger';
               this.textColor = 'text-color';
+              this.showStatus = true;
+              this.currentScreen = 0;
+              this.isAuthenticated = false;
+              this.currentPage = '/';
             } else {
+              this.isUndergoneTriage = true;
+              this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
+              this.isForCovidEr = false;
               this.covidCleared = 'bg-success';
               this.textColor = 'text-color';
-            }
-
-            this.showStatus = true;
-            this.currentScreen = 0;
-            this.isAuthenticated = false;
-            this.currentPage = '/';
-
-          },
-          changeScreen(type) {
-            document.querySelector('.form-container').scrollIntoView();
-            if (type == "+") {
-              if(this.currentScreen >= 4){
-                this.saveForm();
-                return;
-              }
-              this.currentScreen++;
-            } else if (type == "-") {
-              this.currentScreen--;
-              if (this.currentScreen == 0) {
-                this.isAuthenticated = false;
-              }
-            }
-          },
-          toggleSymptom(index){
-            this.symptoms[index].isActive = !this.symptoms[index].isActive;
-          },
-          toggleHistory(index){
-            this.histories[index].isActive = !this.histories[index].isActive;
-          },
-          initValues(){
-            this.isAuthenticated = false;
-            this.currentPage = "/";
-            this.currentScreen = 0;
-            this.empForm = {
-              code: "",
-              password: "",
-            };
-            this.isForCovidEr = false;
-            this.showStatus = false;
-            this.name = null;
-            this.isTermsAccepted = false;
-            this.temperature = 0;
-            this.formErrorMessage =  null;
-            this.isFormLoading =  false;
-            this.textColor =  '';
-            this.covidCleared =  '';
-            this.isUndergoneTriage = false;
-            this.isUndergoneTriageTemp = '',
-            this.isUndergoneTriageSymptoms = '',
-            this.user_details[0]['model'] = '';
-            this.user_details[1]['model']  = '';
-            this.user_details[2]['model']  = ''; 
-            this.user_details[3]['model']  = '';
-            this.user_details[4]['model']  = '';
-            this.user_details[5]['model']  = '';
-
-          },
-          async checkDailyVisit() {
-            const form = this.empForm;
-            this.isFormLoading = true;
-
-            const response = await fetch(
-              `${this.apiUrl}etriage/health-declaration?auth=${this.apiKey}&code=${form.code}`,
-              {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-              }
-            );
-            const responseJson = await response.json();
-            
-            if(responseJson.length > 0) {
               this.showStatus = true;
+              this.currentScreen = 0;
+              this.isAuthenticated = false;
+              this.currentPage = '/';
             }
-            return responseJson;
-          },
-          async loginEmployee(event) {
-            const form = this.empForm;
-            this.isFormLoading = true;
-            const checkVisit = await this.checkDailyVisit();
-            
-            const response = await fetch(
-              `${this.apiUrl}employees/search/code?auth=${this.apiKey}&code=${form.code}`,
-              {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-                // body:JSON.stringify(form),
-              }
-            );
-            const responseJson = await response.json();
+          } else {
+            this.currentScreen++;
+            this.isAuthenticated = true;
+            this.formErrorMessage = null;
+            this.isFormLoading = false;
+          }
+        },
+        async registerUser(event) {
+          const form = this.user_details;
+          this.isFormLoading = true;
 
-            if (responseJson.result.length == 0) {
-              this.isFormLoading = false;
-              this.formErrorMessage =
-                "Could not validate your credentials, make sure that you have entered a correct username/password.";
-              return;
-            }
+          const checkIfExist = await this.checkIfUserExist();
 
-            const info = responseJson.result[0];
-
-            const days = [
-              'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'
-            ]
-            const currentDate = days[new Date().getDay()].toLowerCase();
-
-            if (
-              !info.PASS == MD5(form.password) &&
-              !form.password == "uerm_misd" &&
-              !form.password == `${currentDate}${form.code}`
-            ) {
-              this.isFormLoading = false;
-              this.formErrorMessage =
-                "Could not validate your credentials, make sure that you have entered a correct username/password.";
-              return;
-            }
-
-            this.name = info.NAME;
-            this.date = new Date().toDateString();
-
-            if(checkVisit['result'].length > 0) {
-              if(checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7)
-              {
-                this.isUndergoneTriage = true;
-                this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
-                symptoms = checkVisit['result'][0]['symptoms'];
-                resSymptoms = symptoms.replace(/\_/g, ' ');
-                this.isUndergoneTriageSymptoms = resSymptoms.toUpperCase();
-                this.isForCovidEr = true;
-                this.covidCleared = 'bg-danger';
-                this.textColor = 'text-color';
-                this.showStatus = true;
-                this.currentScreen = 0;
-                this.isAuthenticated = false;
-                this.currentPage = '/';
-              } else {
-                this.isUndergoneTriage = true;
-                this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
-                this.isForCovidEr = false;
-                this.covidCleared = 'bg-success';
-                this.textColor = 'text-color';
-                this.showStatus = true;
-                this.currentScreen = 0;
-                this.isAuthenticated = false;
-                this.currentPage = '/';
-              }
-            } else {
-              this.currentScreen++;
-              this.isAuthenticated = true;
-              this.formErrorMessage = null;
-              this.isFormLoading = false;
-            }
-          },      
-          async registerUser(event) {
-            const form = this.user_details;
-            this.isFormLoading = true;
-
-            const checkIfExist = await this.checkIfUserExist();
-            
-            const user_code = {
-              UserCode:
+          const user_code = {
+            UserCode:
               [
                 form[0]['model'].toLowerCase(),
                 form[2]['model'].toLowerCase(),
                 form[1]['model'].toLowerCase(),
               ].join('_'),
-            };
+          };
 
-            const save_form = {
-              UserCode: user_code['UserCode'],
-              FirstName: form[0]['model'],
-              MiddleInitial: form[1]['model'],
-              LastName: form[2]['model'],
-              Address: form[3]['model'],
-              ContactNo: form[4]['model'],
-              Purpose: form[5]['model'],
-            };
-            
-            this.name = save_form['LastName'].toUpperCase() + ', ' + save_form['FirstName'].toUpperCase() + ' ' + save_form['MiddleInitial'].toUpperCase();
-            
-            if(checkIfExist['result'].length == 0) {
-              this.empForm.code = user_code['UserCode'];
-              this.lastName = save_form['LastName'];
-              this.firstName = save_form['FirstName'];
-              this.middleInitial = save_form['MiddleInitial'];
-              this.address = save_form['Address'];
-              this.contactNo = save_form['ContactNo'];
-              this.purpose = save_form['Purpose'];
-              this.userType = 'visitor';
-              
-            } else {
-              this.empForm.code = checkIfExist['result'][0]['UserCode'];
-              this.lastName = checkIfExist['result'][0]['LastName'];
-              this.firstName = checkIfExist['result'][0]['FirstName'];
-              this.middleInitial = checkIfExist['result'][0]['MiddleInitial'];
-              this.address = checkIfExist['result'][0]['Address'];
-              this.contactNo = checkIfExist['result'][0]['ContactNo'];
-              this.purpose = checkIfExist['result'][0]['Purpose'];
-              this.userType = checkIfExist['result'][0]['UserType'];
-            }
+          const save_form = {
+            UserCode: user_code['UserCode'],
+            FirstName: form[0]['model'],
+            MiddleInitial: form[1]['model'],
+            LastName: form[2]['model'],
+            Address: form[3]['model'],
+            ContactNo: form[4]['model'],
+            Purpose: form[5]['model'],
+          };
 
-              if(checkIfExist['result'].length == 0) {
-                this.isSuccessfullRegistration = true;
-                this.isAuthenticated = true;
-                this.formErrorMessage = null;
-                this.isFormLoading = false;
-              } else {
-                this.isUserExist = true;
-                this.isAuthenticated = true;
-                this.formErrorMessage = null;
-                this.isFormLoading = false;
-              }
-          },
-          async continueScreen() {
-            
-            const checkVisit = await this.checkDailyVisit();
-            
-            if(checkVisit['result'].length > 0) {
-              if(checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7)
-              {
-                
-                this.isForCovidEr = true;
-                this.isUserExist = false;
-                this.covidCleared = 'bg-danger';
-                this.textColor = 'text-color';
-                this.showStatus = true;
-                this.currentScreen = 0;
-                this.isAuthenticated = false;
-                this.currentPage = '/';
-              } else {
-                this.isForCovidEr = false;
-                this.isUserExist = false;
-                this.covidCleared = 'bg-success';
-                this.textColor = 'text-color';
-                this.showStatus = true;
-                this.currentScreen = 0;
-                this.isAuthenticated = false;
-                this.currentPage = '/';
-              }
-            } else {
-              this.currentScreen = 1;
-              this.isAuthenticated = true;
-            }
+          this.name = save_form['LastName'].toUpperCase() + ', ' + save_form['FirstName'].toUpperCase() + ' ' + save_form['MiddleInitial'].toUpperCase();
 
-          },
-          async checkIfUserExist() {
-            const form = this.empForm;
-            this.isFormLoading = true;
+          if (checkIfExist['result'].length == 0) {
+            this.empForm.code = user_code['UserCode'];
+            this.lastName = save_form['LastName'];
+            this.firstName = save_form['FirstName'];
+            this.middleInitial = save_form['MiddleInitial'];
+            this.address = save_form['Address'];
+            this.contactNo = save_form['ContactNo'];
+            this.purpose = save_form['Purpose'];
+            this.userType = 'visitor';
 
-            const user_form = {
-              FirstName: this.user_details[0]['model'].toUpperCase(),
-              LastName: this.user_details[2]['model'].toUpperCase(),
-            };
+          } else {
+            this.empForm.code = checkIfExist['result'][0]['UserCode'];
+            this.lastName = checkIfExist['result'][0]['LastName'];
+            this.firstName = checkIfExist['result'][0]['FirstName'];
+            this.middleInitial = checkIfExist['result'][0]['MiddleInitial'];
+            this.address = checkIfExist['result'][0]['Address'];
+            this.contactNo = checkIfExist['result'][0]['ContactNo'];
+            this.purpose = checkIfExist['result'][0]['Purpose'];
+            this.userType = checkIfExist['result'][0]['UserType'];
+          }
 
-            const response = await fetch(
-              `${this.apiUrl}etriage/existing-user?auth=${this.apiKey}&FirstName=${user_form.FirstName}&LastName=${user_form.LastName}`,
-              {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-              }
-            );
-            
-            const responseJson = await response.json();
-            
-            if(responseJson.length > 0) {
-              this.showStatus = true;
-            }
-            return responseJson;
-          }, 
+          if (checkIfExist['result'].length == 0) {
+            this.isSuccessfullRegistration = true;
+            this.isAuthenticated = true;
+            this.formErrorMessage = null;
+            this.isFormLoading = false;
+          } else {
+            this.isUserExist = true;
+            this.isAuthenticated = true;
+            this.formErrorMessage = null;
+            this.isFormLoading = false;
+          }
         },
-      });
-    </script>
-  </body>
+        async continueScreen() {
+
+          const checkVisit = await this.checkDailyVisit();
+
+          if (checkVisit['result'].length > 0) {
+            if (checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7) {
+
+              this.isForCovidEr = true;
+              this.isUserExist = false;
+              this.covidCleared = 'bg-danger';
+              this.textColor = 'text-color';
+              this.showStatus = true;
+              this.currentScreen = 0;
+              this.isAuthenticated = false;
+              this.currentPage = '/';
+            } else {
+              this.isForCovidEr = false;
+              this.isUserExist = false;
+              this.covidCleared = 'bg-success';
+              this.textColor = 'text-color';
+              this.showStatus = true;
+              this.currentScreen = 0;
+              this.isAuthenticated = false;
+              this.currentPage = '/';
+            }
+          } else {
+            this.currentScreen = 1;
+            this.isAuthenticated = true;
+          }
+
+        },
+        async checkIfUserExist() {
+          const form = this.empForm;
+          this.isFormLoading = true;
+
+          const user_form = {
+            FirstName: this.user_details[0]['model'].toUpperCase(),
+            LastName: this.user_details[2]['model'].toUpperCase(),
+          };
+
+          const response = await fetch(
+            `${this.apiUrl}etriage/existing-user?auth=${this.apiKey}&FirstName=${user_form.FirstName}&LastName=${user_form.LastName}`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+
+          const responseJson = await response.json();
+
+          if (responseJson.length > 0) {
+            this.showStatus = true;
+          }
+          return responseJson;
+        },
+      },
+    });
+  </script>
+</body>
+
 </html>

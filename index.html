@@ -132,7 +132,7 @@
               <h4>{{symptom.english}}</h4>
               <div>{{symptom.tagalog}}</div>
             </div>
-            <div style="width:180px" class="text-center" v-on:click="toggleSymptom(index)">
+            <div style="width:260px" class="text-center" v-on:click="toggleSymptom(index)">
               <a href="#" class="badge" v-bind:class="{'badge-primary':symptom.isActive}">Yes</a>
               <a href="#" class="badge" v-bind:class="{'badge-primary':!symptom.isActive}">No</a>
             </div>
@@ -453,7 +453,7 @@
           };
 
           if (!this.isTermsAccepted || this.temperature < 35 || this.temperature > 42) {
-            this.formErrorMessage = 'Please provide your temperature and verify that you understand the terms and conditions.';
+            this.formErrorMessage = 'Please provide a valid temperature between 35 and 42 and verify that you understand the terms and conditions.';
             return;
           }
 
@@ -467,11 +467,12 @@
           );
 
           const responseJson = await response.json();
+            
           if (responseJson.error) {
             this.formErrorMessage = responseJson.message;
             return;
           }
-
+          
           if (form['SymptomAndHistory_Code'] || form['Temperature'] > 37.7) {
             this.isForCovidEr = true;
             this.covidCleared = 'bg-danger';

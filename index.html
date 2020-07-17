@@ -452,6 +452,7 @@
             ].join(';'),
           };
           
+          this.temperature = this.temperature.trim();
           if(isNaN(this.temperature)) {
             this.formErrorMessage = 'Please enter a valid number between 35 and 42';
             return;

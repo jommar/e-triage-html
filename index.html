@@ -451,11 +451,17 @@
               ...histories
             ].join(';'),
           };
+          
+          if(isNaN(this.temperature)) {
+            this.formErrorMessage = 'Please enter a valid number between 35 and 42';
+            return;
+          }
 
           if (!this.isTermsAccepted || this.temperature < 35 || this.temperature > 42) {
             this.formErrorMessage = 'Please provide a valid temperature between 35 and 42 and verify that you understand the terms and conditions.';
             return;
           }
+          
 
           const response = await fetch(
             `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,

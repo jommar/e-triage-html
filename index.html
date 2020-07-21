@@ -1,4 +1,5 @@
 <html>
+
 <head>
   <title>UERM E-Triage</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,15 +20,19 @@
     html {
       height: 100% !important;
     }
+
     .item.active {
       background-color: rgba(166, 220, 255, 0.5);
     }
+
     .item {
       cursor: pointer;
     }
+
     .text-color {
       color: white;
     }
+
     #vue-app {
       overflow: auto;
     }
@@ -39,7 +44,7 @@
     <h1 class="mb-3 bg-primary p-3 text-white">UERM E-Triage</h1>
     <div class="container-fluid py-5">
       <div v-if="showStatus" class="text-center">
-        <div v-if="!isForCovidEr">
+        <div v-if="!isForCovidEr && !isForCovidErCleared">
           <h1>You may now enter the UERM premises.</h1>
           <b class="fa fa-check-circle" style="font-size:13rem"></b>
           <h3>{{name}}</h3>
@@ -55,6 +60,24 @@
         </div>
         <div v-if="isForCovidEr">
           <h1>Please proceed to COVID ER for proper evaluation and management.</h1>
+          <b class="fa fa-exclamation-circle" style="font-size:13rem"></b>
+          <h3>{{name}}</h3>
+          <h4>{{date}}</h4>
+          <h3>Temperature: {{isUndergoneTriageTemp}}</h3>
+          <h3>Symptoms:</h3>
+          <span v-for="symptom in isUndergoneTriageSymptoms.split(';')" class="badge badge-primary m-1">
+            {{symptom}}
+          </span>
+          <p>KINDLY OBSERVE THE FOLLOWING:
+          <ul style="list-style-type:none;">
+            <li>Wear a mask at all times</li>
+            <li>Observe physical distancing</li>
+            <li>Wash or sanitize your hands regularly</li>
+          </ul>
+          </p>
+        </div>
+        <div v-if="isForCovidErCleared">
+          <h1>You are cleared to entry inside UERM premises</h1>
           <b class="fa fa-exclamation-circle" style="font-size:13rem"></b>
           <h3>{{name}}</h3>
           <h4>{{date}}</h4>
@@ -289,6 +312,7 @@
         },
         date: new Date().toDateString(),
         isForCovidEr: false,
+        isForCovidErCleared: false,
         showStatus: false,
         name: null,
         isTermsAccepted: false,
@@ -457,9 +481,9 @@
               ...histories
             ].join(';'),
           };
-          
+
           this.temperature = this.temperature.trim();
-          if(isNaN(this.temperature)) {
+          if (isNaN(this.temperature)) {
             this.formErrorMessage = 'Please enter a valid number between 35 and 42';
             return;
           }
@@ -468,7 +492,6 @@
             this.formErrorMessage = 'Please provide a valid temperature between 35 and 42 and verify that you understand the terms and conditions.';
             return;
           }
-          
 
           const response = await fetch(
             `${this.apiUrl}etriage/save-health-declaration?auth=${this.apiKey}`,
@@ -480,12 +503,12 @@
           );
 
           const responseJson = await response.json();
-            
+
           if (responseJson.error) {
             this.formErrorMessage = responseJson.message;
             return;
           }
-          
+
           if (form['SymptomAndHistory_Code'] || form['Temperature'] > 37.7) {
             this.isForCovidEr = true;
             this.covidCleared = 'bg-danger';
@@ -534,6 +557,7 @@
             password: "",
           };
           this.isForCovidEr = false;
+          this.isForCovidErCleared = false;
           this.showStatus = false;
           this.name = null;
           this.isTermsAccepted = false;
@@ -613,21 +637,36 @@
 
           this.name = info.NAME;
           this.date = new Date().toDateString();
-
+          
           if (checkVisit['result'].length > 0) {
             if (checkVisit['result'][0]['symptoms'] || checkVisit['result'][0]['temperature'] > 37.7) {
-              this.isUndergoneTriage = true;
-              this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
-              symptoms = checkVisit['result'][0]['symptoms'];
-              resSymptoms = symptoms.replace(/\_/g, ' ');
-              this.isUndergoneTriageSymptoms = resSymptoms.toUpperCase();
-              this.isForCovidEr = true;
-              this.covidCleared = 'bg-danger';
-              this.textColor = 'text-color';
-              this.showStatus = true;
-              this.currentScreen = 0;
-              this.isAuthenticated = false;
-              this.currentPage = '/';
+              if(checkVisit['result'][0]['isCleared'] == true) {
+                this.isUndergoneTriage = true;
+                this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
+                symptoms = checkVisit['result'][0]['symptoms'];
+                resSymptoms = symptoms.replace(/\_/g, ' ');
+                this.isUndergoneTriageSymptoms = resSymptoms.toUpperCase();
+                this.isForCovidErCleared = true;
+                this.covidCleared = 'bg-success';
+                this.textColor = 'text-color';
+                this.showStatus = true;
+                this.currentScreen = 0;
+                this.isAuthenticated = false;
+                this.currentPage = '/';
+              } else {
+                this.isUndergoneTriage = true;
+                this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
+                symptoms = checkVisit['result'][0]['symptoms'];
+                resSymptoms = symptoms.replace(/\_/g, ' ');
+                this.isUndergoneTriageSymptoms = resSymptoms.toUpperCase();
+                this.isForCovidEr = true;
+                this.covidCleared = 'bg-danger';
+                this.textColor = 'text-color';
+                this.showStatus = true;
+                this.currentScreen = 0;
+                this.isAuthenticated = false;
+                this.currentPage = '/';
+              }
             } else {
               this.isUndergoneTriage = true;
               this.isUndergoneTriageTemp = checkVisit['result'][0]['temperature'];
